@@ -1,35 +1,20 @@
 # .principles
 
-**Expert knowledge as code — portable AI lenses for writing and reviewing software.**
+**Select the software engineering principles you want your AI coding agent to focus on.**
 
-A curated catalog of software engineering principles with proper academic citations, designed to be loaded by AI coding agents (Claude Code, GitHub Copilot, Cursor, etc.) to improve code generation and review.
+A curated catalog of software engineering principles, organized into a `.principles` hierarchy that projects declare to guide AI code generation and review.
 
-## What is this?
+> See [DISCLAIMER.md](DISCLAIMER.md) — this is a proof of concept. Groups are opinionated, gaps exist, and adjustments are expected.
 
-A collection of **150+ numbered, citable software engineering principles** organized by category, with a `.principles` hierarchy system that encodes which principles apply per directory — eliminating repeated detection on every command run.
+## Philosophy
 
-Each principle has:
-- A unique ID (e.g., `CODE-SD-001`, `CODE-SEC-003`, `CODE-CS-007`)
-- A clear description of the principle
-- What violations look like
-- Good practices to follow
-- Full source citations (ISBN, DOI, URL)
+`.principles` does **not** teach the AI anything. Modern AI coding agents already know SOLID, OWASP, DDD, and the rest. The point is to **focus and trigger** that knowledge — to give the AI context about *which* principles matter for *this* codebase, alongside the other AI instructions it receives (AGENTS.md, CLAUDE.md, `.github/copilot-instructions.md`, etc.).
 
-See [DESIGN.md](DESIGN.md) for the full system design.
+Think of it as: the AI instructions tell the agent *how to behave*; `.principles` tells it *which engineering lens to apply*.
 
 ## How it works
 
-### The Layer Model
-
-| Layer | When | What |
-|-------|------|------|
-| **Layer 1 — Universal** | Always active | 14 non-negotiable principles (validate input, single responsibility, fail fast, etc.) |
-| **Layer 2 — Contextual** | Based on what you're building | API design, concurrency, data modeling, etc. — activated by `.principles` files or signal detection |
-| **Layer 3 — Risk-elevated** | Based on risk signals | Security, performance, backward compatibility — escalated when auth, payments, PII, or hot paths are detected |
-
-### The `.principles` File
-
-Place a `.principles` file in your project to declare which principles apply:
+Place a `.principles` file in your project root (and optionally in subdirectories) to declare which principles apply:
 
 ```
 # Activate all Spring Boot principles (includes java)
@@ -42,12 +27,20 @@ CODE-OB-004
 !CODE-API-012
 ```
 
-The system walks up from the reviewed file to the git root, collecting `.principles` files and merging them (outermost first, innermost last).
+The system walks up from the reviewed file to the git root, collecting `.principles` files and merging them (outermost first, innermost last). The AI then reads the full principle content before coding or reviewing.
+
+### Layer model
+
+| Layer | When | What |
+|-------|------|------|
+| **Layer 1 — Universal** | Always active | Non-negotiable principles (validate input, single responsibility, fail fast, etc.) |
+| **Layer 2 — Contextual** | Based on what you're building | API design, concurrency, data modeling, etc. |
+| **Layer 3 — Risk-elevated** | Based on risk signals | Security, performance, backward compatibility |
 
 ### Three commands
 
-- **`/scout`** — Analyses your project, detects language/framework/domain, and creates `.principles` files for you.
-- **`/prime`** — Resolves your `.principles` hierarchy, reads full principle guidance, then prepares your coding frame.
+- **`/scout`** — Analyses your project, detects language/framework/domain, and creates `.principles` files.
+- **`/prime`** — Resolves your `.principles` hierarchy, reads full principle guidance, prepares your coding frame.
 - **`/audit`** — Resolves your `.principles` hierarchy, reads principle content, reviews code, and groups findings by severity (Critical / High / Medium / Low).
 
 ## Quick start
@@ -60,49 +53,32 @@ git clone https://github.com/flemming-n-larsen/.principles.git
 ./install.sh claude
 
 # Use it — in Claude Code:
-#   /scout    → detect profile and create .principles files
-#   /prime             → before writing code
-#   /audit <file>         → after writing code
+#   /scout         → detect profile and create .principles files
+#   /prime         → before writing code
+#   /audit <file>  → after writing code
 ```
 
-## Principle categories
+## Principle catalog
 
-| ID Prefix | Category | Examples |
-|-----------|----------|----------|
-| `CODE-SD-` | Software Design | SOLID, GoF patterns, composition, simplicity |
-| `CODE-SEC-` | Security | OWASP Top 10, input validation, secrets management |
-| `CODE-CS-` | Code Smells & Refactoring | Feature envy, long method, primitive obsession |
-| `CODE-API-` | API Design | Backward compatibility, idempotency, REST constraints |
-| `CODE-CC-` | Concurrency | Thread safety, structured concurrency, shared-nothing |
-| `CODE-DM-` | Domain Modeling | Bounded contexts, aggregates, value objects |
-| `CODE-AR-` | Architecture | 12-Factor, clean architecture, integration patterns |
-| `CODE-RL-` | Reliability & Error Handling | Fail fast, circuit breakers, idempotent operations |
-| `CODE-PF-` | Performance | Mechanical sympathy, data locality, backpressure |
-| `CODE-TS-` | Testing Strategy | TDD, test isolation, behavior-driven specs |
-| `CODE-OB-` | Observability & Operations | Structured logging, distributed tracing, SLOs |
-| `CODE-DX-` | Developer Experience | Naming, readability, cognitive load, UX heuristics |
-| `CODE-TP-` | Type & Pattern Safety | Type-driven design, exhaustive matching, nullability |
+150+ principles across 13 categories:
 
-## Shipped groups
+| ID Prefix | Category |
+|-----------|----------|
+| `CODE-SD-` | Software Design (SOLID, GoF, composition, simplicity) |
+| `CODE-SEC-` | Security (OWASP Top 10, input validation, secrets) |
+| `CODE-CS-` | Code Smells & Refactoring |
+| `CODE-API-` | API Design |
+| `CODE-CC-` | Concurrency |
+| `CODE-DM-` | Domain Modeling |
+| `CODE-AR-` | Architecture |
+| `CODE-RL-` | Reliability & Error Handling |
+| `CODE-PF-` | Performance |
+| `CODE-TS-` | Testing Strategy |
+| `CODE-OB-` | Observability & Operations |
+| `CODE-DX-` | Developer Experience |
+| `CODE-TP-` | Type & Pattern Safety |
 
-Pre-built groups for common stacks. Reference them with `@name` in `.principles` files.
-
-| Group | Includes | Purpose |
-|-------|----------|---------|
-| `java` | — | Java OOP and concurrency |
-| `typescript` | — | TypeScript type safety |
-| `python` | — | Python readability |
-| `go` | — | Go composition and concurrency |
-| `csharp` | — | C# OOP and async |
-| `rust` | — | Rust ownership and safety |
-| `spring-boot` | java | Spring Boot REST and DI |
-| `spring-data-jpa` | spring-boot | JPA repositories and aggregates |
-| `react` | typescript | React components and hooks |
-| `angular` | typescript | Angular components and DI |
-| `django` | python | Django models and views |
-| `fastapi` | python | FastAPI async endpoints |
-| `microservices` | — | Resilience and observability |
-| `security-focused` | — | Full security principle set |
+Shipped groups (e.g., `@spring-boot`, `@react`, `@microservices`, `@security-focused`) bundle related principles for common stacks. See [DESIGN.md](DESIGN.md#5-groups) for the full list.
 
 ## Example review output
 
@@ -117,49 +93,28 @@ Pre-built groups for common stacks. Reference them with `@name` in `.principles`
   OrderService.java:23 — counter field modified across request threads.
   → Use AtomicInteger or move state into request scope.
 
-## Medium
-- CODE-CS-004: Feature envy
-  OrderService.java:61 — accesses 4 fields from Customer but lives in OrderService.
-  → Move method to Customer or extract a domain method.
-
 ## Low
 - CODE-DX-002: Boolean parameter obscures intent
   OrderService.java:89 — processOrder(true) is unclear at call site.
   → Replace with enum or separate methods.
 
 ## Summary
-Findings: 1 critical, 1 high, 1 medium, 1 low
-Active principles: CODE-SEC-001..011, CODE-CC-001..008, CODE-CS-DRY, CODE-CS-YAGNI, CODE-SD-001..007
+Findings: 1 critical, 1 high, 1 low
+Active principles: CODE-SEC-001..011, CODE-CC-001..008, CODE-SD-001..007
 Principle source: .principles hierarchy (2 files)
 ```
 
-## Adding a company namespace
+## Extending with your own principles
 
-Add your own principles alongside the shipped catalog:
-
-```bash
-mkdir -p principles/corp
-```
-
-```yaml
-# principles/corp/catalog.yaml
-namespace: corp
-id-prefix: CORP
-description: "Acme Corp engineering standards"
-```
-
-Then reference `CORP-0001` in your `.principles` files. See [DESIGN.md](DESIGN.md#8-adding-a-new-namespace) for full details.
+Fork this repo and add a `principles/corp/` namespace (or any name) for corporate or domain-specific principles. Reference them with `CORP-0001` in your `.principles` files. See [DESIGN.md](DESIGN.md#8-adding-a-new-namespace) for the full process.
 
 ## Contributing
 
-Every contribution requires:
-- A clear principle description in your own words
-- At least one verifiable published source (book with ISBN, paper with DOI, or authoritative URL)
-- Categorization and layer assignment
-
-See [DESIGN.md](DESIGN.md#10-contributing-principles) for the full process.
+Every contribution requires a clear principle description, at least one verifiable published source (book with ISBN, paper with DOI, or authoritative URL), and correct layer assignment. See [DESIGN.md](DESIGN.md#10-contributing-principles) for the full process.
 
 ## License
 
 - **Principle texts:** [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — use freely, credit required, share-alike
 - **Scripts and tooling:** [MIT](https://opensource.org/licenses/MIT)
+- **How to apply this in practice:** see [LICENSE-INTERPRETATION.md](LICENSE-INTERPRETATION.md) (including `internal use` vs `distribution`, and what users/developers may do and must do)
+- **Ownership boundary:** see [Ownership and curation scope](LICENSE-INTERPRETATION.md#10-ownership-and-curation-scope)

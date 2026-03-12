@@ -1,0 +1,5 @@
+# Default behavior
+* text=auto
+
+# Markdown files — treat as UTF-8 text with LF line endings
+*.md text eol=lf working-tree-encoding=UTF-8

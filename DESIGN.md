@@ -8,6 +8,10 @@ This document describes the full architecture of the `.principles` hierarchy sys
 
 **What it is:** A portable, project-local configuration system that tells AI coding agents which software engineering principles apply to your codebase — similar in spirit to `.gitignore`, but for coding guidance.
 
+**Philosophy:** `.principles` does not teach the AI anything — the AI already knows SOLID, OWASP, DDD, and the rest. It *focuses and triggers* that knowledge: giving the AI context about which principles matter for this codebase, alongside other AI instructions (AGENTS.md, CLAUDE.md, `.github/copilot-instructions.md`). The AI instructions tell the agent how to behave; `.principles` tells it which engineering lens to apply.
+
+> See [DISCLAIMER.md](DISCLAIMER.md) — this is a proof of concept. Groups are opinionated, gaps exist, and the catalog is not exhaustive.
+
 **Who it is for:**
 - **Developers** who want consistent, principle-driven code review and generation across all their projects
 - **Teams** who want shared principle sets tailored to their stack (e.g., Spring Boot, React, microservices)
@@ -126,19 +130,19 @@ IDs are **derived from file path** — no separate ID field is needed in the fil
 
 ### Examples
 
-| File path (relative to `principles/`) | ID |
-|---|---|
-| `solid/srp.md` | `SOLID-SRP` |
-| `gof/strategy.md` | `GOF-STRATEGY` |
-| `ddd/aggregate.md` | `DDD-AGGREGATE` |
-| `code-smells/feature-envy.md` | `CODE-SMELLS-FEATURE-ENVY` |
-| `grasp/low-coupling.md` | `GRASP-LOW-COUPLING` |
-| `12factor/01-codebase.md` | `12FACTOR-01-CODEBASE` |
-| `owasp/01-broken-access-control.md` | `OWASP-01-BROKEN-ACCESS-CONTROL` |
-| `code/api/standard-http-methods.md` | `CODE-API-STANDARD-HTTP-METHODS` |
-| `code/sec/validate-input.md` | `CODE-SEC-VALIDATE-INPUT` |
-| `corp/corp-0001.md` | `CORP-0001` |
-| `arch/xx/yy/yy-01.md` | `ARCH-XX-YY-01` |
+| File path (relative to `principles/`) | ID                               |
+|---------------------------------------|----------------------------------|
+| `solid/srp.md`                        | `SOLID-SRP`                      |
+| `gof/strategy.md`                     | `GOF-STRATEGY`                   |
+| `ddd/aggregate.md`                    | `DDD-AGGREGATE`                  |
+| `code-smells/feature-envy.md`         | `CODE-SMELLS-FEATURE-ENVY`       |
+| `grasp/low-coupling.md`               | `GRASP-LOW-COUPLING`             |
+| `12factor/01-codebase.md`             | `12FACTOR-01-CODEBASE`           |
+| `owasp/01-broken-access-control.md`   | `OWASP-01-BROKEN-ACCESS-CONTROL` |
+| `code/api/standard-http-methods.md`   | `CODE-API-STANDARD-HTTP-METHODS` |
+| `code/sec/validate-input.md`          | `CODE-SEC-VALIDATE-INPUT`        |
+| `corp/corp-0001.md`                   | `CORP-0001`                      |
+| `arch/xx/yy/yy-01.md`                 | `ARCH-XX-YY-01`                  |
 
 ### Step-by-step: `code/api/standard-http-methods.md`
 
@@ -160,7 +164,7 @@ IDs are **derived from file path** — no separate ID field is needed in the fil
 
 Every principle file follows this template:
 
-```markdown
+````markdown
 # [ID]: [Title]
 
 **Layer**: [1 | 2 | 3]
@@ -189,18 +193,18 @@ Every principle file follows this template:
 ## Sources
 
 - [Author, *Title*, Publisher, Year. ISBN/DOI/URL]
-```
+````
 
 ### Fields
 
-| Field | Description |
-|-------|-------------|
-| `Layer` | 1 = always active, 2 = context-dependent, 3 = risk-elevated |
-| `Categories` | Semantic tags for detection (e.g., `api-design`, `security`, `testing`) |
-| `Applies-to` | `all` or specific languages, platforms, domains, or architectural contexts |
-| `Violations to detect` | Concrete patterns for AI to look for during review |
-| `Good practice` | Positive example (AI uses this for generation guidance) |
-| `Sources` | At least one verifiable published source |
+| Field                  | Description                                                                |
+|------------------------|----------------------------------------------------------------------------|
+| `Layer`                | 1 = always active, 2 = context-dependent, 3 = risk-elevated                |
+| `Categories`           | Semantic tags for detection (e.g., `api-design`, `security`, `testing`)    |
+| `Applies-to`           | `all` or specific languages, platforms, domains, or architectural contexts |
+| `Violations to detect` | Concrete patterns for AI to look for during review                         |
+| `Good practice`        | Positive example (AI uses this for generation guidance)                    |
+| `Sources`              | At least one verifiable published source                                   |
 
 **Diagrams:** Include a `mermaid` code block in the *Good practice* section whenever the concept has a structural form (class hierarchies, relationships, flows). Mermaid adds machine-readable semantics. If you can draw it, draw it.
 
@@ -226,12 +230,12 @@ principles:
   - CODE-AR-003
 ```
 
-| Field | Description |
-|-------|-------------|
-| `name` | Must match filename (without `.yaml`) |
-| `description` | Human-readable summary |
-| `includes` | Other group names to compose (resolved recursively) |
-| `principles` | List of principle IDs this group activates |
+| Field         | Description                                         |
+|---------------|-----------------------------------------------------|
+| `name`        | Must match filename (without `.yaml`)               |
+| `description` | Human-readable summary                              |
+| `includes`    | Other group names to compose (resolved recursively) |
+| `principles`  | List of principle IDs this group activates          |
 
 ### Composition
 
@@ -241,35 +245,35 @@ principles:
 
 ### Shipped Groups
 
-| Group | Includes | Purpose |
-|-------|----------|---------|
-| `solid` | — | All five SOLID principles |
-| `gof` | — | All 25 GoF entries (2 principles + 23 patterns) |
-| `gof-creational` | — | 5 GoF creational patterns |
-| `gof-structural` | — | 7 GoF structural patterns |
-| `gof-behavioral` | — | 11 GoF behavioral patterns |
-| `ddd` | — | 8 Domain-Driven Design building blocks |
-| `simple-design` | — | Kent Beck's 4 Rules of Simple Design |
-| `clean-arch` | — | 4 Clean Architecture principles |
-| `effective-java` | — | 10 Effective Java best practices |
-| `code-smells` | — | 9 Fowler code smells |
-| `grasp` | — | All nine GRASP responsibility patterns |
-| `12factor` | — | All twelve Twelve-Factor App practices |
-| `owasp` | — | OWASP Top 10 (2021) security risks |
-| `java` | effective-java | Java language fundamentals |
-| `typescript` | — | TypeScript type safety and patterns |
-| `python` | — | Python readability and Pythonic patterns |
-| `go` | — | Go composition and concurrency |
-| `csharp` | solid | C# OOP and async patterns |
-| `rust` | — | Rust ownership and type safety |
-| `spring-boot` | java | Spring Boot REST and DI |
-| `spring-data-jpa` | spring-boot, ddd | JPA repositories and aggregates |
-| `react` | typescript | React components and hooks |
-| `angular` | typescript | Angular components and DI |
-| `django` | python | Django models and views |
-| `fastapi` | python | FastAPI async endpoints |
-| `microservices` | — | Inter-service resilience and observability |
-| `security-focused` | owasp | Security-heavy codebases |
+| Group              | Includes         | Purpose                                         |
+|--------------------|------------------|-------------------------------------------------|
+| `solid`            | —                | All five SOLID principles                       |
+| `gof`              | —                | All 25 GoF entries (2 principles + 23 patterns) |
+| `gof-creational`   | —                | 5 GoF creational patterns                       |
+| `gof-structural`   | —                | 7 GoF structural patterns                       |
+| `gof-behavioral`   | —                | 11 GoF behavioral patterns                      |
+| `ddd`              | —                | 8 Domain-Driven Design building blocks          |
+| `simple-design`    | —                | Kent Beck's 4 Rules of Simple Design            |
+| `clean-arch`       | —                | 4 Clean Architecture principles                 |
+| `effective-java`   | —                | 10 Effective Java best practices                |
+| `code-smells`      | —                | 9 Fowler code smells                            |
+| `grasp`            | —                | All nine GRASP responsibility patterns          |
+| `12factor`         | —                | All twelve Twelve-Factor App practices          |
+| `owasp`            | —                | OWASP Top 10 (2021) security risks              |
+| `java`             | effective-java   | Java language fundamentals                      |
+| `typescript`       | —                | TypeScript type safety and patterns             |
+| `python`           | —                | Python readability and Pythonic patterns        |
+| `go`               | —                | Go composition and concurrency                  |
+| `csharp`           | solid            | C# OOP and async patterns                       |
+| `rust`             | —                | Rust ownership and type safety                  |
+| `spring-boot`      | java             | Spring Boot REST and DI                         |
+| `spring-data-jpa`  | spring-boot, ddd | JPA repositories and aggregates                 |
+| `react`            | typescript       | React components and hooks                      |
+| `angular`          | typescript       | Angular components and DI                       |
+| `django`           | python           | Django models and views                         |
+| `fastapi`          | python           | FastAPI async endpoints                         |
+| `microservices`    | —                | Inter-service resilience and observability      |
+| `security-focused` | owasp            | Security-heavy codebases                        |
 
 ### Rules
 
@@ -301,13 +305,13 @@ CORP-0001
 !CODE-TS-001
 ```
 
-| Syntax | Meaning |
-|--------|---------|
-| `# ...` | Comment (ignored) |
-| `@name` | Include all principles from `groups/name.yaml` (recursive) |
-| `ID` | Include a specific principle by ID |
-| `!ID` | Exclude a principle (takes final precedence over everything, including Layer 1) |
-| blank line | Ignored |
+| Syntax     | Meaning                                                                         |
+|------------|---------------------------------------------------------------------------------|
+| `# ...`    | Comment (ignored)                                                               |
+| `@name`    | Include all principles from `groups/name.yaml` (recursive)                      |
+| `ID`       | Include a specific principle by ID                                              |
+| `!ID`      | Exclude a principle (takes final precedence over everything, including Layer 1) |
+| blank line | Ignored                                                                         |
 
 IDs are matched case-insensitively.
 
@@ -360,13 +364,13 @@ Activates principles before writing code. Run it before starting work on a task.
 
 **Phases:**
 
-| Phase | Name | Description |
-|-------|------|-------------|
-| 1 | Scan Context | Examines the coding context: language, framework, domain, risk signals |
-| 2 | Resolve .principles Hierarchy | Walks to git root, expands groups, builds active ID set |
-| 3 | Dynamic Detection (fallback) | Only runs if Phase 2 found no `.principles` files; uses signal-based detection |
-| 4 | Read Principle Content | Reads actual `.md` files; extracts full guidance (Violations + Good Practice) |
-| 5 | Output | Presents active principles table with source column; states coding frame |
+| Phase | Name                          | Description                                                                    |
+|-------|-------------------------------|--------------------------------------------------------------------------------|
+| 1     | Scan Context                  | Examines the coding context: language, framework, domain, risk signals         |
+| 2     | Resolve .principles Hierarchy | Walks to git root, expands groups, builds active ID set                        |
+| 3     | Dynamic Detection (fallback)  | Only runs if Phase 2 found no `.principles` files; uses signal-based detection |
+| 4     | Read Principle Content        | Reads actual `.md` files; extracts full guidance (Violations + Good Practice)  |
+| 5     | Output                        | Presents active principles table with source column; states coding frame       |
 
 ### `/audit`
 
@@ -374,14 +378,14 @@ Reviews code against activated principles. Outputs findings grouped by severity.
 
 **Phases:**
 
-| Phase | Name | Description |
-|-------|------|-------------|
-| 1 | Resolve Input | Determines what code to review (file, directory, inline) |
-| 2 | Resolve .principles Hierarchy | Same walk algorithm as prime |
-| 3 | Dynamic Detection (fallback) | Only if no `.principles` files found |
-| 4 | Read Principle Content | Reads `.md` files; uses "Violations to detect" sections |
-| 5 | Review | Applies each principle; groups findings by severity (Critical/High/Medium/Low) |
-| 6 | Summary | Reports findings count; states principle source (hierarchy vs. dynamic detection) |
+| Phase | Name                          | Description                                                                       |
+|-------|-------------------------------|-----------------------------------------------------------------------------------|
+| 1     | Resolve Input                 | Determines what code to review (file, directory, inline)                          |
+| 2     | Resolve .principles Hierarchy | Same walk algorithm as prime                                                      |
+| 3     | Dynamic Detection (fallback)  | Only if no `.principles` files found                                              |
+| 4     | Read Principle Content        | Reads `.md` files; uses "Violations to detect" sections                           |
+| 5     | Review                        | Applies each principle; groups findings by severity (Critical/High/Medium/Low)    |
+| 6     | Summary                       | Reports findings count; states principle source (hierarchy vs. dynamic detection) |
 
 ### `/scout`
 
@@ -389,13 +393,13 @@ Analyses a project directory and creates or updates `.principles` files.
 
 **Phases:**
 
-| Phase | Name | Description |
-|-------|------|-------------|
-| 1 | Resolve Target | Resolves `$ARGUMENTS` or CWD as the target directory |
-| 2 | Detect Profile | Detects language, framework, domain; analyses per-directory profiles |
-| 3 | Propose Placements | Proposes `.principles` placements — root + overrides for test dirs, security dirs, submodules |
-| 4 | Check Existing | Merges additions only; never removes or touches `!exclusions` |
-| 5 | Write Files | Creates or updates files; reports created/updated/unchanged per path |
+| Phase | Name               | Description                                                                                   |
+|-------|--------------------|-----------------------------------------------------------------------------------------------|
+| 1     | Resolve Target     | Resolves `$ARGUMENTS` or CWD as the target directory                                          |
+| 2     | Detect Profile     | Detects language, framework, domain; analyses per-directory profiles                          |
+| 3     | Propose Placements | Proposes `.principles` placements — root + overrides for test dirs, security dirs, submodules |
+| 4     | Check Existing     | Merges additions only; never removes or touches `!exclusions`                                 |
+| 5     | Write Files        | Creates or updates files; reports created/updated/unchanged per path                          |
 
 ---
 
@@ -441,9 +445,9 @@ The system discovers all `principles/*/catalog.yaml` files automatically. The na
 
 ### Depth Recommendations
 
-| Depth | Use when | Example |
-|-------|---------|---------|
-| 2 levels: `NS/CAT` | ≤20 principles per category | `CODE-SD-001` |
+| Depth                  | Use when                            | Example              |
+|------------------------|-------------------------------------|----------------------|
+| 2 levels: `NS/CAT`     | ≤20 principles per category         | `CODE-SD-001`        |
 | 3 levels: `NS/CAT/SUB` | Large category needing sub-grouping | `ARCH-CLOUD-K8S-001` |
 
 Keep paths shallow. Deep nesting makes IDs hard to read and reference.
