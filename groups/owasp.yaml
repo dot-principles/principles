@@ -1,0 +1,14 @@
+name: owasp
+description: "OWASP Top 10 (2021) — the ten most critical web application security risks"
+
+principles:
+  - OWASP-A01
+  - OWASP-A02
+  - OWASP-A03
+  - OWASP-A04
+  - OWASP-A05
+  - OWASP-A06
+  - OWASP-A07
+  - OWASP-A08
+  - OWASP-A09
+  - OWASP-A10

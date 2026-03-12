@@ -37,6 +37,28 @@ principles/
     api/
       api-001.md
     ...
+  solid/                 ← SOLID principles (5 principles)
+    catalog.yaml         ← declares namespace: solid, id-prefix: SOLID
+    srp.md               → SOLID-SRP
+    ocp.md               → SOLID-OCP
+    lsp.md               → SOLID-LSP
+    isp.md               → SOLID-ISP
+    dip.md               → SOLID-DIP
+  grasp/                 ← GRASP patterns (9 principles)
+    catalog.yaml         ← declares namespace: grasp, id-prefix: GRASP
+    information-expert.md → GRASP-INFORMATION-EXPERT
+    low-coupling.md       → GRASP-LOW-COUPLING
+    ...
+  12factor/              ← Twelve-Factor App (12 principles)
+    catalog.yaml         ← declares namespace: 12factor, id-prefix: 12FACTOR
+    01-codebase.md       → 12FACTOR-01-CODEBASE
+    02-dependencies.md   → 12FACTOR-02-DEPENDENCIES
+    ...
+  owasp/                 ← OWASP Top 10 (10 principles)
+    catalog.yaml         ← declares namespace: owasp, id-prefix: OWASP
+    a01.md               → OWASP-A01
+    a02.md               → OWASP-A02
+    ...
   corp/                  ← example: company-added namespace
     catalog.yaml         ← declares namespace: corp, id-prefix: CORP
     corp-0001.md
@@ -83,6 +105,10 @@ IDs are **derived from file path** — no separate ID field is needed in the fil
 
 | File path (relative to `principles/`) | ID |
 |---|---|
+| `solid/srp.md` | `SOLID-SRP` |
+| `grasp/low-coupling.md` | `GRASP-LOW-COUPLING` |
+| `12factor/01-codebase.md` | `12FACTOR-01-CODEBASE` |
+| `owasp/a01.md` | `OWASP-A01` |
 | `code/api/api-001.md` | `CODE-API-001` |
 | `code/sd/sd-001.md` | `CODE-SD-001` |
 | `code/sec/sec-001.md` | `CODE-SEC-001` |
@@ -190,6 +216,10 @@ principles:
 
 | Group | Includes | Purpose |
 |-------|----------|---------|
+| `solid` | — | All five SOLID principles |
+| `grasp` | — | All nine GRASP responsibility patterns |
+| `12factor` | — | All twelve Twelve-Factor App practices |
+| `owasp` | — | OWASP Top 10 (2021) security risks |
 | `java` | — | Java language fundamentals |
 | `typescript` | — | TypeScript type safety and patterns |
 | `python` | — | Python readability and Pythonic patterns |
@@ -372,6 +402,7 @@ The system discovers all `principles/*/catalog.yaml` files automatically to rout
 - Namespace prefix: uppercase, short (2-6 chars) — `CODE`, `CORP`, `ARCH`
 - Category segment: 2-4 uppercase chars — `SD`, `API`, `SEC`, `AR`
 - Numeric suffix: zero-padded to 3 digits for top-level (`001`), fewer digits acceptable for deep nesting
+- Named files: when a file name does not start with the parent directory name followed by `-`, the full filename is used verbatim as the final ID segment (e.g., `solid/srp.md` → `SOLID-SRP`, `owasp/a01.md` → `OWASP-A01`). Numeric prefixes work the same way (e.g., `12factor/01-codebase.md` → `12FACTOR-01-CODEBASE`).
 - Avoid: special characters, spaces, mixed case
 
 ### Depth Recommendations
