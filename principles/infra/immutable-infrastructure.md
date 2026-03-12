@@ -1,4 +1,4 @@
-# INFRA-002 — Infrastructure is immutable: replace, never patch
+# INFRA-IMMUTABLE-INFRASTRUCTURE — Infrastructure is immutable: replace, never patch
 
 **Layer:** 2 (contextual)
 **Categories:** infrastructure, devops, reliability

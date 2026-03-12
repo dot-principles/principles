@@ -1,4 +1,4 @@
-# INFRA-001 — All infrastructure is code; nothing is configured manually
+# INFRA-INFRASTRUCTURE-AS-CODE — All infrastructure is code; nothing is configured manually
 
 **Layer:** 1 (universal)
 **Categories:** infrastructure, devops, repeatability

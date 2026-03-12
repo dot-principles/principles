@@ -1,4 +1,4 @@
-# INFRA-003 — Secrets never appear in code, config files, or logs
+# INFRA-NO-SECRETS-IN-CODE — Secrets never appear in code, config files, or logs
 
 **Layer:** 1 (universal)
 **Categories:** infrastructure, security, devops
