@@ -257,6 +257,13 @@ COPILOT_EOF
     echo -e "  ${GREEN}✓${NC} $target_file"
     echo ""
     echo "Copilot instructions written. Review and commit the file."
+    echo ""
+    echo "IDE notes:"
+    echo "  VS Code   — .github/copilot-instructions.md is auto-detected. No setup needed."
+    echo "              For path-specific instructions (Java, TypeScript, security, etc.),"
+    echo "              use: ./install.sh vscode <dir>"
+    echo "  JetBrains — Verify: Settings > Languages & Frameworks > GitHub Copilot > Use instruction files"
+    echo "  CLI       — Works automatically from repository root."
 }
 
 install_cursor() {
@@ -328,6 +335,315 @@ CURSOR_EOF
     echo "Cursor rules written. The rule will apply to all files in the project."
 }
 
+install_vscode() {
+    local project_dir="${1:-.}"
+
+    if [ ! -d "$project_dir" ]; then
+        echo -e "${RED}Error: Directory '$project_dir' does not exist.${NC}"
+        exit 1
+    fi
+
+    echo -e "${BOLD}Generating VS Code Copilot instructions for: $project_dir${NC}"
+
+    local github_dir="$project_dir/.github"
+    local base_file="$github_dir/copilot-instructions.md"
+    local instructions_dir="$github_dir/instructions"
+
+    mkdir -p "$instructions_dir"
+
+    # Base file — layer overview
+    if [ -f "$base_file" ] && [ -s "$base_file" ]; then
+        echo -e "${YELLOW}Warning: $base_file already exists.${NC}"
+        echo "  Appending .principles section. Review the file afterward."
+        echo "" >> "$base_file"
+        echo "<!-- .principles: begin -->" >> "$base_file"
+    else
+        echo "<!-- .principles: begin -->" > "$base_file"
+    fi
+
+    cat >> "$base_file" << 'VSCODE_BASE_EOF'
+# .principles — AI Coding Guidelines
+
+When writing or reviewing code in this project, follow the layered principle system below.
+
+## Layer 1 — Always Active (apply to all code)
+
+- **SOLID-SRP**: Single Responsibility — one reason to change per module/class/function
+- **GOF-COMPOSITION-OVER-INHERITANCE**: Favor composition over inheritance
+- **GOF-PROGRAM-TO-INTERFACE**: Program to an interface, not an implementation
+- **CODE-SEC-VALIDATE-INPUT**: Validate input at system boundaries
+- **CODE-CS-DRY**: Don't repeat knowledge — single authoritative representation
+- **CODE-DX-NAMING**: Name things by what they represent
+- **CODE-DX-SMALL-FUNCTIONS**: Keep functions small and single-purpose
+- **CODE-DX-CODE-FOR-READERS**: Write code for the reader, not the writer
+- **CODE-CS-FAIL-FAST**: Fail fast, fail loudly — never silently swallow errors
+- **INFRA-NO-SECRETS-IN-CODE**: Never commit credentials, tokens, or keys
+
+## Layer 2 — Context-Dependent
+
+Path-specific instruction files in `.github/instructions/` apply additional principles
+automatically based on file type and location (language, API code, security-sensitive paths, tests).
+
+## Layer 3 — Risk-Elevated
+
+Elevate scrutiny for code handling authentication, financial data, PII, or public APIs.
+See `.github/instructions/security.instructions.md`.
+VSCODE_BASE_EOF
+
+    echo "<!-- .principles: end -->" >> "$base_file"
+    echo -e "  ${GREEN}✓${NC} .github/copilot-instructions.md"
+
+    # --- Path-specific instruction files ---
+
+    cat > "$instructions_dir/java.instructions.md" << 'EOF'
+---
+applyTo: "**/*.java,**/*.kt"
+---
+# Java / Kotlin principles
+
+## SOLID
+- **SOLID-SRP**: Single Responsibility — one reason to change per class/module
+- **SOLID-OCP**: Open/Closed — open for extension, closed for modification
+- **SOLID-LSP**: Liskov Substitution — subtypes must be substitutable for their base types
+- **SOLID-ISP**: Interface Segregation — prefer narrow, focused interfaces
+- **SOLID-DIP**: Dependency Inversion — depend on abstractions, not concretions
+
+## Effective Java
+- **EJ-STATIC-FACTORY**: Prefer static factory methods over constructors
+- **EJ-BUILDER**: Use the builder pattern when constructors have many parameters
+- **EJ-MINIMIZE-MUTABILITY**: Prefer immutable classes; make fields final where possible
+- **EJ-MINIMIZE-ACCESSIBILITY**: Reduce visibility as much as possible
+- **EJ-ELIMINATE-UNCHECKED**: Eliminate unchecked warnings
+
+## Concurrency
+- **CODE-CC-SYNC-SHARED-STATE**: Synchronize all access to shared mutable state
+- **CODE-CC-SAFE-PUBLICATION**: Ensure objects are safely published across threads
+- **CODE-CC-STRUCTURED-CONCURRENCY**: Use structured concurrency (Java 21+ StructuredTaskScope)
+- **CODE-CC-TASK-BASED-CONCURRENCY**: Prefer tasks over raw threads
+- **CODE-CC-DOCUMENT-THREAD-SAFETY**: Document thread-safety guarantees on every class
+
+## Type Safety
+- **CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE**: Use the type system to prevent invalid states
+- **CODE-TP-EXHAUSTIVE-PATTERN-MATCHING**: Handle all cases in switch expressions and pattern matches
+- **CODE-TP-PREFER-SUM-TYPES**: Use sealed interfaces or enums to model alternatives
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/java.instructions.md"
+
+    cat > "$instructions_dir/typescript.instructions.md" << 'EOF'
+---
+applyTo: "**/*.ts,**/*.tsx"
+---
+# TypeScript principles
+
+## Type Safety
+- **CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE**: Use discriminated unions and the type system to prevent invalid states
+- **CODE-TP-EXHAUSTIVE-PATTERN-MATCHING**: Use exhaustive checks (`never`) in switch statements and union handling
+- **CODE-TP-PREFER-SUM-TYPES**: Model alternatives with discriminated unions, not optional fields
+- **CODE-TP-TYPE-STATE-MACHINES**: Encode state machine transitions in the type system
+- **CODE-TP-BRANDED-TYPES**: Use branded/nominal types to distinguish structurally identical values
+
+## Design
+- **GOF-COMPOSITION-OVER-INHERITANCE**: Prefer composition and mixins over class hierarchies
+- **GOF-PROGRAM-TO-INTERFACE**: Depend on interfaces and type aliases, not concrete implementations
+- **SOLID-SRP**: Each module, class, or function should have one reason to change
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/typescript.instructions.md"
+
+    cat > "$instructions_dir/javascript.instructions.md" << 'EOF'
+---
+applyTo: "**/*.js,**/*.jsx,**/*.mjs,**/*.cjs"
+---
+# JavaScript principles
+
+## Design
+- **GOF-COMPOSITION-OVER-INHERITANCE**: Prefer composition over prototype chains
+- **GOF-PROGRAM-TO-INTERFACE**: Depend on duck-typed interfaces, not concrete objects
+- **SOLID-SRP**: Each module or function should have one reason to change
+- **CODE-CS-DRY**: Single authoritative representation — avoid copy-paste logic
+- **CODE-CS-YAGNI**: Don't add abstractions until they're needed
+- **CODE-DX-SMALL-FUNCTIONS**: Keep functions small and focused on one task
+
+## Reliability
+- **CODE-CS-FAIL-FAST**: Surface errors immediately; avoid silent failures
+- **CODE-RL-FAULT-TOLERANCE**: Handle async failures explicitly; don't leave unhandled promise rejections
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/javascript.instructions.md"
+
+    cat > "$instructions_dir/python.instructions.md" << 'EOF'
+---
+applyTo: "**/*.py"
+---
+# Python principles
+
+## Design
+- **SOLID-SRP**: Each class or function should have one reason to change
+- **GOF-COMPOSITION-OVER-INHERITANCE**: Prefer composition and mixins over deep inheritance chains
+- **CODE-CS-DRY**: Single authoritative representation — avoid duplicating logic
+- **CODE-CS-KISS**: Prefer simple, readable solutions over clever ones
+- **CODE-DX-CODE-FOR-READERS**: Write for the reader; Python's readability is a feature, not a bonus
+
+## Code Smells to avoid
+- **CODE-SMELLS-LONG-METHOD**: Extract methods when a function grows beyond a single screen
+- **CODE-SMELLS-LARGE-CLASS**: Split classes that accumulate unrelated responsibilities
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/python.instructions.md"
+
+    cat > "$instructions_dir/csharp.instructions.md" << 'EOF'
+---
+applyTo: "**/*.cs"
+---
+# C# principles
+
+## SOLID
+- **SOLID-SRP**: Single Responsibility — one reason to change per class
+- **SOLID-OCP**: Open/Closed — open for extension, closed for modification
+- **SOLID-LSP**: Liskov Substitution — subtypes must be substitutable for their base types
+- **SOLID-ISP**: Interface Segregation — prefer narrow, focused interfaces
+- **SOLID-DIP**: Dependency Inversion — depend on abstractions, not concretions
+
+## Type Safety
+- **CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE**: Use the type system to prevent invalid states
+- **CODE-TP-EXHAUSTIVE-PATTERN-MATCHING**: Use exhaustive switch expressions with discard patterns
+- **CODE-TP-PREFER-SUM-TYPES**: Use discriminated unions (OneOf) or sealed class hierarchies
+- **CODE-TP-TYPE-STATE-MACHINES**: Encode state transitions in the type system
+
+## Concurrency
+- **CODE-CC-TASK-BASED-CONCURRENCY**: Prefer Task/async-await over raw Thread
+- **CODE-CC-STRUCTURED-CONCURRENCY**: Use CancellationToken for cooperative cancellation
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/csharp.instructions.md"
+
+    cat > "$instructions_dir/go.instructions.md" << 'EOF'
+---
+applyTo: "**/*.go"
+---
+# Go principles
+
+## Design
+- **GOF-COMPOSITION-OVER-INHERITANCE**: Embed interfaces and structs; avoid deep type hierarchies
+- **GOF-PROGRAM-TO-INTERFACE**: Accept interfaces, return structs
+- **CODE-CS-DRY**: Single authoritative representation — avoid duplicating logic
+- **ARCH-OBSERVABILITY-BY-DESIGN**: Instrument code with structured logging and tracing from the start
+
+## Concurrency
+- **CODE-CC-SYNC-SHARED-STATE**: Protect all shared state with mutexes or channels
+- **CODE-CC-HIGHER-LEVEL-CONCURRENCY**: Use goroutines and channels; avoid low-level sync primitives where possible
+- **CODE-CC-TASK-BASED-CONCURRENCY**: Prefer goroutine-based task patterns with explicit lifecycle management
+- **CODE-CC-STRUCTURED-CONCURRENCY**: Use errgroup or similar for structured goroutine lifecycle management
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/go.instructions.md"
+
+    cat > "$instructions_dir/rust.instructions.md" << 'EOF'
+---
+applyTo: "**/*.rs"
+---
+# Rust principles
+
+## Type Safety
+- **CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE**: Use enums and the type system to prevent invalid states
+- **CODE-TP-EXHAUSTIVE-PATTERN-MATCHING**: Handle all enum variants in match expressions; avoid wildcard `_` unless intentional
+- **CODE-TP-PREFER-SUM-TYPES**: Model alternatives with enums, not Option chains
+- **CODE-TP-TYPE-STATE-MACHINES**: Encode state transitions using the typestate pattern
+
+## Concurrency
+- **CODE-CC-SYNC-SHARED-STATE**: Use Arc<Mutex<T>> or channels; trust the borrow checker
+- **CODE-CC-SAFE-PUBLICATION**: Ensure data shared across threads implements Send + Sync
+
+## Performance
+- **CODE-PF-PROFILE-FIRST**: Measure before optimizing; use cargo flamegraph or perf
+- **CODE-PF-DATA-LOCALITY**: Prefer cache-friendly data structures (Vec over LinkedList)
+- **CODE-PF-MECHANICAL-SYMPATHY**: Write with the underlying hardware in mind; minimize allocations
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/rust.instructions.md"
+
+    cat > "$instructions_dir/api.instructions.md" << 'EOF'
+---
+applyTo: "**/controller/**,**/controllers/**,**/handler/**,**/handlers/**,**/router/**,**/routers/**,**/route/**,**/routes/**,**/api/**,**/endpoint/**,**/endpoints/**"
+---
+# API design principles
+
+- **CODE-API-STANDARD-HTTP-METHODS**: Use HTTP methods by their RFC 9110 semantics (GET=safe, PUT/DELETE=idempotent)
+- **CODE-API-RESOURCE-NOUNS**: Resource URLs use nouns, not verbs (`/orders`, not `/getOrders`)
+- **CODE-API-HTTP-STATUS-CODES**: Return semantically correct HTTP status codes
+- **CODE-API-BACKWARD-COMPATIBILITY**: Never break existing clients; add fields, don't remove or rename
+- **CODE-API-HATEOAS**: Include hypermedia links in responses where appropriate
+- **CODE-RL-IDEMPOTENCY**: Ensure mutating operations are safe to retry
+- **CODE-CS-POSTELS-LAW**: Be conservative in what you send, liberal in what you accept
+- **CODE-CS-HYRUMS-LAW**: All observable behaviors become implicit contracts — design deliberately
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/api.instructions.md"
+
+    cat > "$instructions_dir/security.instructions.md" << 'EOF'
+---
+applyTo: "**/auth/**,**/authentication/**,**/authorization/**,**/security/**,**/crypto/**,**/cryptography/**,**/payment/**,**/payments/**,**/oauth/**,**/jwt/**"
+---
+# Security principles (elevated risk)
+
+## Input & Access
+- **CODE-SEC-VALIDATE-INPUT**: Validate and sanitize all input at system boundaries
+- **OWASP-01-BROKEN-ACCESS-CONTROL**: Enforce access control on every request; deny by default
+- **OWASP-03-INJECTION**: Use parameterized queries and safe APIs; never build queries from user input
+- **OWASP-07-AUTHENTICATION-FAILURES**: Implement secure session management and MFA where appropriate
+
+## Cryptography
+- **CODE-SEC-STRONG-CRYPTOGRAPHY**: Use vetted algorithms (AES-256, SHA-256+); never roll your own crypto
+- **OWASP-02-CRYPTOGRAPHIC-FAILURES**: Encrypt data in transit and at rest; avoid weak algorithms
+
+## Design & Infrastructure
+- **CODE-SEC-SECURITY-BY-DESIGN**: Build security in from the start; do not treat it as an afterthought
+- **OWASP-04-INSECURE-DESIGN**: Threat-model during design; identify and mitigate risks before coding
+- **OWASP-05-SECURITY-MISCONFIGURATION**: Disable default credentials; harden configs; apply least privilege
+- **INFRA-NO-SECRETS-IN-CODE**: Never commit credentials, tokens, or keys; use environment variables or vaults
+- **INFRA-LEAST-PRIVILEGE**: Grant only the minimum permissions needed
+
+## Integrity & Logging
+- **CODE-SEC-DATA-INTEGRITY**: Verify integrity of data and third-party components
+- **OWASP-08-SOFTWARE-INTEGRITY-FAILURES**: Verify signatures and checksums for all dependencies
+- **CODE-SEC-SECURITY-LOGGING**: Log security events (auth failures, access denials) with sufficient detail
+- **OWASP-09-LOGGING-FAILURES**: Ensure security-relevant events are logged and monitored
+- **OWASP-10-SSRF**: Validate and restrict outbound requests; never fetch arbitrary user-supplied URLs
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/security.instructions.md"
+
+    cat > "$instructions_dir/test.instructions.md" << 'EOF'
+---
+applyTo: "**/*Test.java,**/*Tests.java,**/*Spec.java,**/*_test.go,**/*_test.py,**/*.test.ts,**/*.spec.ts,**/*.test.js,**/*.spec.js,**/*.test.tsx,**/*.spec.tsx,**/test/**,**/tests/**,**/spec/**,**/specs/**"
+---
+# Testing principles
+
+- **CODE-TS-SINGLE-BEHAVIOR**: Each test verifies exactly one behavior or requirement
+- **CODE-TS-TEST-BEHAVIOR**: Test what the code does, not how it does it; avoid testing internals
+- **CODE-TS-FAST-TESTS**: Unit tests must run in milliseconds; slow tests belong in integration suites
+- **CODE-TS-TEST-INDEPENDENCE**: Tests must not depend on execution order or share mutable state
+- **CODE-TS-TEST-NAMING**: Test names describe the scenario and expected outcome in plain language
+- **CODE-TS-ARRANGE-ACT-ASSERT**: Structure tests with clear setup, action, and assertion phases
+- **CODE-TS-TEST-DOUBLES**: Use test doubles (mocks, stubs, fakes) only at architectural boundaries
+- **CODE-TS-TEST-FIRST**: Write the test before the implementation to drive design
+EOF
+    echo -e "  ${GREEN}✓${NC} .github/instructions/test.instructions.md"
+
+    echo ""
+    echo "VS Code Copilot instructions written. Commit these files and they will be"
+    echo "active for all workspace users automatically — no IDE setup required."
+    echo ""
+    echo "Files generated:"
+    echo "  .github/copilot-instructions.md     — Layer overview (all tools)"
+    echo "  .github/instructions/               — Path-specific (VS Code only)"
+    echo "    java.instructions.md              applyTo: *.java, *.kt"
+    echo "    typescript.instructions.md        applyTo: *.ts, *.tsx"
+    echo "    javascript.instructions.md        applyTo: *.js, *.jsx, *.mjs"
+    echo "    python.instructions.md            applyTo: *.py"
+    echo "    csharp.instructions.md            applyTo: *.cs"
+    echo "    go.instructions.md                applyTo: *.go"
+    echo "    rust.instructions.md              applyTo: *.rs"
+    echo "    api.instructions.md               applyTo: controller/handler/router/api paths"
+    echo "    security.instructions.md          applyTo: auth/security/crypto/payment paths"
+    echo "    test.instructions.md              applyTo: test/spec files"
+    echo ""
+    echo "  JetBrains note: only .github/copilot-instructions.md is supported."
+    echo "  Verify: Settings > Languages & Frameworks > GitHub Copilot > Use instruction files"
+}
+
 uninstall_claude() {
     echo -e "${BOLD}Removing Claude Code slash commands...${NC}"
 
@@ -372,7 +688,8 @@ show_usage() {
     echo ""
     echo "Targets:"
     echo "  claude              Install slash commands to ~/.claude/commands/"
-    echo "  copilot [dir]       Generate .github/copilot-instructions.md (default: current dir)"
+    echo "  copilot [dir]       Generate .github/copilot-instructions.md — Copilot CLI + JetBrains"
+    echo "  vscode [dir]        Generate copilot-instructions.md + path-specific .github/instructions/"
     echo "  cursor [dir]        Generate .cursor/rules/.principles.mdc (default: current dir)"
     echo "  all [dir]           Install all targets"
     echo ""
@@ -397,13 +714,16 @@ case "${1:-}" in
     copilot)
         install_copilot "${2:-.}"
         ;;
+    vscode)
+        install_vscode "${2:-.}"
+        ;;
     cursor)
         install_cursor "${2:-.}"
         ;;
     all)
         install_claude
         echo ""
-        install_copilot "${2:-.}"
+        install_vscode "${2:-.}"
         echo ""
         install_cursor "${2:-.}"
         ;;
