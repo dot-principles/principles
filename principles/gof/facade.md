@@ -26,12 +26,12 @@ classDiagram
     class VideoConverter {
         +convert(filename, format) File
     }
-    class VideoFile {}
-    class OggCompressionCodec {}
-    class MPEG4CompressionCodec {}
-    class CodecFactory {}
-    class BitrateReader {}
-    class AudioMixer {}
+    class VideoFile
+    class OggCompressionCodec
+    class MPEG4CompressionCodec
+    class CodecFactory
+    class BitrateReader
+    class AudioMixer
     VideoConverter ..> VideoFile
     VideoConverter ..> OggCompressionCodec
     VideoConverter ..> MPEG4CompressionCodec

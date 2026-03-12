@@ -1,4 +1,4 @@
-# CS-001 — Don't repeat knowledge
+# CODE-CS-DRY — DRY: Don't Repeat Yourself
 
 **Layer:** 1 (universal)
 **Categories:** code-smells, maintainability, refactoring
@@ -6,7 +6,7 @@
 
 ## Principle
 
-Every piece of knowledge must have a single, unambiguous, authoritative representation within a system. This is not about eliminating duplicate lines of code — it is about ensuring that each business rule, algorithm, or policy decision exists in exactly one place. If the same decision is encoded in multiple locations, they will inevitably diverge.
+Every piece of knowledge must have a single, unambiguous, authoritative representation within a system. DRY is not about eliminating duplicate lines of code — it is about ensuring that each business rule, algorithm, or policy decision exists in exactly one place. If the same decision is encoded in multiple locations, they will inevitably diverge.
 
 ## Why it matters
 

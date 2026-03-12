@@ -35,7 +35,7 @@ Seed the active set with these universally-active principles:
 | CODE-SD-031 | No duplication |
 | CODE-SD-032 | Fewest elements |
 | CODE-SEC-001 | Validate input at system boundaries |
-| CODE-CS-001 | Don't repeat knowledge |
+| CODE-CS-DRY | DRY: Don't Repeat Yourself |
 | CODE-DX-001 | Name things by what they represent |
 | CODE-DX-002 | Keep functions small and single-purpose |
 | CODE-DX-003 | Write code for the reader, not the writer |
@@ -103,7 +103,7 @@ Activate: CODE-TS-001 through CODE-TS-008
 
 **object-oriented** — Class hierarchies, interfaces, inheritance, OOP patterns
 Signals: class, extends, implements, interface, abstract, override, virtual, protected, super(, base., inheritance, polymorphism
-Activate: CODE-SD-001 through CODE-SD-007, CODE-CS-001 through CODE-CS-010
+Activate: CODE-SD-001 through CODE-SD-007, CODE-CS-DRY, CODE-CS-YAGNI
 
 **cloud-native** — Cloud deployment, containers, twelve-factor app patterns
 Signals: Dockerfile, docker-compose, kubernetes, k8s, helm, env_var, process.env, os.environ, ConfigMap, Secret, health_check, readiness, liveness, twelve-factor, 12-factor, container, pod, service mesh
@@ -159,7 +159,7 @@ Elevate: CODE-RL-002 through CODE-RL-006, CODE-OB-001 through CODE-OB-003, CODE-
 
 **legacy-codebase** — Refactoring, migration, brownfield work
 Signals: refactor, migration, brownfield, legacy, technical_debt, tech_debt, deprecated, backward_compat, strangler, anti-corruption, modernize, rewrite, upgrade
-Elevate: CODE-CS-001 through CODE-CS-010, CODE-SD-029 through CODE-SD-032
+Elevate: CODE-CS-DRY, CODE-CS-YAGNI, CODE-SD-029 through CODE-SD-032
 
 ## Phase 4 — Load Principle Content
 

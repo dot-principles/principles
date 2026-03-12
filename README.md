@@ -129,7 +129,7 @@ Pre-built groups for common stacks. Reference them with `@name` in `.principles`
 
 ## Summary
 Findings: 1 critical, 1 high, 1 medium, 1 low
-Active principles: CODE-SEC-001..011, CODE-CC-001..008, CODE-CS-001..010, CODE-SD-001..007
+Active principles: CODE-SEC-001..011, CODE-CC-001..008, CODE-CS-DRY, CODE-CS-YAGNI, CODE-SD-001..007
 Principle source: .principles hierarchy (2 files)
 ```
 
