@@ -1,4 +1,4 @@
-# OWASP-A10 — Server-Side Request Forgery (SSRF)
+# OWASP-10-SSRF — Server-Side Request Forgery (SSRF)
 
 **Layer:** 2 (contextual)
 **Categories:** security, injection, network

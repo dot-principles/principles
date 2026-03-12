@@ -1,4 +1,4 @@
-# OWASP-A04 — Insecure Design
+# OWASP-04-INSECURE-DESIGN — Insecure Design
 
 **Layer:** 2 (contextual)
 **Categories:** security, architecture, threat-modelling

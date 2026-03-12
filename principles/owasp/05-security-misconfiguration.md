@@ -1,4 +1,4 @@
-# OWASP-A05 — Security Misconfiguration
+# OWASP-05-SECURITY-MISCONFIGURATION — Security Misconfiguration
 
 **Layer:** 2 (contextual)
 **Categories:** security, configuration, hardening

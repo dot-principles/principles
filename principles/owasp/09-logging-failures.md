@@ -1,4 +1,4 @@
-# OWASP-A09 — Security Logging and Monitoring Failures
+# OWASP-09-LOGGING-FAILURES — Security Logging and Monitoring Failures
 
 **Layer:** 2 (contextual)
 **Categories:** security, observability, incident-response

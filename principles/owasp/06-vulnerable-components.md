@@ -1,4 +1,4 @@
-# OWASP-A06 — Vulnerable and Outdated Components
+# OWASP-06-VULNERABLE-COMPONENTS — Vulnerable and Outdated Components
 
 **Layer:** 2 (contextual)
 **Categories:** security, dependency-management, supply-chain

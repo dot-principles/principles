@@ -82,8 +82,8 @@ principles/
     ...
   owasp/                 ← OWASP Top 10 (10 principles)
     catalog.yaml         ← description only
-    a01.md               → OWASP-A01
-    a02.md               → OWASP-A02
+    01-broken-access-control.md  → OWASP-01-BROKEN-ACCESS-CONTROL
+    02-cryptographic-failures.md → OWASP-02-CRYPTOGRAPHIC-FAILURES
     ...
   corp/                  ← example: company-added namespace
     catalog.yaml         ← description only
@@ -134,7 +134,7 @@ IDs are **derived from file path** — no separate ID field is needed in the fil
 | `code-smells/feature-envy.md` | `CODE-SMELLS-FEATURE-ENVY` |
 | `grasp/low-coupling.md` | `GRASP-LOW-COUPLING` |
 | `12factor/01-codebase.md` | `12FACTOR-01-CODEBASE` |
-| `owasp/a01.md` | `OWASP-A01` |
+| `owasp/01-broken-access-control.md` | `OWASP-01-BROKEN-ACCESS-CONTROL` |
 | `code/api/standard-http-methods.md` | `CODE-API-STANDARD-HTTP-METHODS` |
 | `code/sec/validate-input.md` | `CODE-SEC-VALIDATE-INPUT` |
 | `corp/corp-0001.md` | `CORP-0001` |
@@ -435,7 +435,7 @@ The system discovers all `principles/*/catalog.yaml` files automatically. The na
 
 - Namespace prefix: uppercase, short (2-6 chars) — `CODE`, `CORP`, `ARCH`
 - Category segment: 2-4 uppercase chars — `SD`, `API`, `SEC`, `AR`
-- Named files: the full filename is used verbatim as the final ID segment (e.g., `solid/srp.md` → `SOLID-SRP`, `code/api/standard-http-methods.md` → `CODE-API-STANDARD-HTTP-METHODS`, `owasp/a01.md` → `OWASP-A01`). Numeric prefixes work the same way (e.g., `12factor/01-codebase.md` → `12FACTOR-01-CODEBASE`).
+- Named files: the full filename is used verbatim as the final ID segment (e.g., `solid/srp.md` → `SOLID-SRP`, `code/api/standard-http-methods.md` → `CODE-API-STANDARD-HTTP-METHODS`, `owasp/01-broken-access-control.md` → `OWASP-01-BROKEN-ACCESS-CONTROL`). Numeric prefixes work the same way (e.g., `12factor/01-codebase.md` → `12FACTOR-01-CODEBASE`).
 - Prefer descriptive slugs over opaque numbers — `validate-input.md` is immediately clear; `sec-001.md` is not.
 - Avoid: special characters, spaces, mixed case
 
