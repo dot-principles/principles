@@ -1,0 +1,9 @@
+name: config
+description: "Structured configuration and data files — YAML, JSON, TOML, XML"
+
+principles:
+  - INFRA-NO-SECRETS-IN-CODE
+  - 12FACTOR-03-CONFIG
+  - CODE-CS-DRY
+  - CODE-DX-NAMING
+  - CODE-CS-YAGNI

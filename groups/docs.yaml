@@ -1,0 +1,10 @@
+name: docs
+description: "Documentation and diagram files — Markdown, AsciiDoc, plain text, Mermaid, D2"
+
+principles:
+  - CODE-DX-NAMING
+  - CODE-DX-CODE-FOR-READERS
+  - CODE-DX-REDUCE-COGNITIVE-LOAD
+  - CODE-CS-DRY
+  - CODE-CS-YAGNI
+  - ARCH-DECISION-RECORDS

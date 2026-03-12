@@ -1,15 +1,10 @@
 name: python
 description: "Python — readability, simplicity, Pythonic patterns"
 
+includes:
+  - source-code
+
 principles:
   - SOLID-SRP
-  - GOF-COMPOSITION-OVER-INHERITANCE
-  - GOF-PROGRAM-TO-INTERFACE
-  - CODE-DX-NAMING
-  - CODE-DX-SMALL-FUNCTIONS
-  - CODE-DX-CODE-FOR-READERS
-  - CODE-DX-REDUCE-COGNITIVE-LOAD
-  - CODE-CS-DRY
   - CODE-SMELLS-LONG-METHOD
   - CODE-SMELLS-LARGE-CLASS
-  - INFRA-NO-SECRETS-IN-CODE
