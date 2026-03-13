@@ -213,7 +213,7 @@ Present findings grouped by severity using this exact format. Omit any severity 
 
 Issues that will cause security vulnerabilities, data loss, or crashes in production.
 
-- [PRINCIPLE-ID]: one-line title
+- [ ] [PRINCIPLE-ID]: one-line title
   [file:line] — what's wrong
   → concrete fix
 
@@ -221,7 +221,7 @@ Issues that will cause security vulnerabilities, data loss, or crashes in produc
 
 Issues affecting correctness, concurrency safety, or API contracts.
 
-- [PRINCIPLE-ID]: one-line title
+- [ ] [PRINCIPLE-ID]: one-line title
   [file:line] — what's wrong
   → concrete fix
 
@@ -229,7 +229,7 @@ Issues affecting correctness, concurrency safety, or API contracts.
 
 Issues affecting maintainability, design quality, or readability.
 
-- [PRINCIPLE-ID]: one-line title
+- [ ] [PRINCIPLE-ID]: one-line title
   [file:line] — what's wrong
   → concrete fix
 
@@ -237,7 +237,7 @@ Issues affecting maintainability, design quality, or readability.
 
 Minor improvements — naming, style, minor smells.
 
-- [PRINCIPLE-ID]: one-line title
+- [ ] [PRINCIPLE-ID]: one-line title
   [file:line] — what's wrong
   → concrete fix
 
@@ -258,3 +258,15 @@ If no issues were found at all, output:
 No issues found.
 Active principles: [comma-separated list of all principle IDs that were checked]
 Principle source: .principles hierarchy (N files) | dynamic detection
+
+Then, if there are any findings, output a Fix Checklist — a flat, agent-ready task list with one line per finding, ordered by file path then line number. This gives an AI agent a self-contained work queue to iterate through and tick off without cross-referencing the sections above.
+
+## Fix Checklist
+
+- [ ] `file:line` · SEVERITY · PRINCIPLE-ID — what's wrong → concrete fix
+
+Rules:
+- Order by file path alphabetically, then by line number within each file.
+- SEVERITY in ALL CAPS: CRITICAL, HIGH, MEDIUM, or LOW.
+- Omit `file:line` if no location is available (inline code review).
+- Omit this section entirely if there are no findings.
