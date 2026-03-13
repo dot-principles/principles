@@ -252,6 +252,8 @@ The prompt files need YAML frontmatter to be discoverable. `install.sh copilot` 
 
 Shipped groups (e.g., `@spring-boot`, `@react`, `@microservices`, `@security-focused`) bundle related principles for common stacks. See [DESIGN.md](DESIGN.md#-5-groups) for the full list.
 
+Many principles include **code examples and diagrams** to make the guidance concrete — not just a definition, but a demonstration of the principle in practice.
+
 ## 💡 Example review output
 
 ```
