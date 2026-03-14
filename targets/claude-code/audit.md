@@ -214,7 +214,7 @@ Present findings grouped by severity using this exact format. Omit any severity 
 Issues that will cause security vulnerabilities, data loss, or crashes in production.
 
 - [ ] [PRINCIPLE-ID]: one-line title
-  [file:line] — what's wrong
+  /absolute/path/to/file:line — what's wrong
   → concrete fix
 
 ## High
@@ -222,7 +222,7 @@ Issues that will cause security vulnerabilities, data loss, or crashes in produc
 Issues affecting correctness, concurrency safety, or API contracts.
 
 - [ ] [PRINCIPLE-ID]: one-line title
-  [file:line] — what's wrong
+  /absolute/path/to/file:line — what's wrong
   → concrete fix
 
 ## Medium
@@ -230,7 +230,7 @@ Issues affecting correctness, concurrency safety, or API contracts.
 Issues affecting maintainability, design quality, or readability.
 
 - [ ] [PRINCIPLE-ID]: one-line title
-  [file:line] — what's wrong
+  /absolute/path/to/file:line — what's wrong
   → concrete fix
 
 ## Low
@@ -238,8 +238,14 @@ Issues affecting maintainability, design quality, or readability.
 Minor improvements — naming, style, minor smells.
 
 - [ ] [PRINCIPLE-ID]: one-line title
-  [file:line] — what's wrong
+  /absolute/path/to/file:line — what's wrong
   → concrete fix
+
+Rules:
+- Each finding is exactly three lines: the `- [ ]` line, the `/absolute/path/to/file:line` line, and the `→` line. No blank lines within a finding.
+- The `- [ ]` line format is: hyphen, space, open-bracket, space, close-bracket, then exactly ONE space before `[PRINCIPLE-ID]` — never two spaces.
+- Always use forward slashes in file paths (e.g. `C:/Code/project/src/file.py:42`). Never use backslashes — they are markdown escape characters and will corrupt filenames containing underscores (e.g. `__init__.py`).
+- Separate consecutive findings with exactly one blank line.
 
 ## Phase 6 — Summary
 
@@ -263,10 +269,13 @@ Then, if there are any findings, output a Fix Checklist — a flat, agent-ready 
 
 ## Fix Checklist
 
-- [ ] `file:line` · SEVERITY · PRINCIPLE-ID — what's wrong → concrete fix
+- [ ] /absolute/path/to/file:line · SEVERITY · PRINCIPLE-ID — what's wrong → concrete fix
 
 Rules:
-- Order by file path alphabetically, then by line number within each file.
+- Each entry is exactly one line — no line breaks or blank lines within or between entries.
+- The format is: `- [ ] ` (hyphen, space, open-bracket, space, close-bracket, then exactly ONE space) before the path — never two spaces.
+- Always use forward slashes in file paths (e.g. `C:/Code/project/src/file.py:42`). Never use backslashes — they are markdown escape characters and will corrupt filenames containing underscores (e.g. `__init__.py`).
+- Order by severity (CRITICAL first, then HIGH, MEDIUM, LOW), then by file path alphabetically, then by line number.
 - SEVERITY in ALL CAPS: CRITICAL, HIGH, MEDIUM, or LOW.
-- Omit `file:line` if no location is available (inline code review).
+- Omit the file path if no location is available (inline code review).
 - Omit this section entirely if there are no findings.
