@@ -261,42 +261,28 @@ Many principles include **code examples and diagrams** to make the guidance conc
 > **Note:** The output below is illustrative. Formatting, structure, and level of detail will vary between AI models and even between runs of the same model. The principle review itself is performed by the AI — some models produce thorough, well-structured audits; others may miss findings or deviate from the template. The `audit-output.json` file is the most reliable artefact; the text report is best-effort.
 
 ```
-## Critical
+Audit complete — 4 findings.
 
-- [ ] CODE-SEC-VALIDATE-INPUT: SQL query built with string concatenation
-  UserRepository.java:47 — user input interpolated directly into query string.
-  → Use parameterized queries (PreparedStatement).
+Critical:
 
-## High
+- `C:/projects/app/UserRepository.java:47` [CODE-SEC-VALIDATE-INPUT] — SQL query built with string concatenation; user input interpolated directly into query string. → Use parameterized queries (PreparedStatement).
 
-- [ ] CODE-CC-SYNC-SHARED-STATE: Shared mutable state without synchronization
-  OrderService.java:23 — counter field modified across request threads.
-  → Use AtomicInteger or move state into request scope.
+High:
 
-## Medium
+- `C:/projects/app/OrderService.java:23` [CODE-CC-SYNC-SHARED-STATE] — Shared mutable state without synchronization; counter field modified across request threads. → Use AtomicInteger or move state into request scope.
 
-- [ ] CODE-RL-IDEMPOTENCY: Non-idempotent retry path
-  PaymentClient.java:61 — charge() called in retry loop with no idempotency key.
-  → Pass a stable idempotency key so retries do not double-charge.
+Medium:
 
-## Low
+- `C:/projects/app/PaymentClient.java:61` [CODE-RL-IDEMPOTENCY] — Non-idempotent retry path; charge() called in retry loop with no idempotency key. → Pass a stable idempotency key so retries do not double-charge.
 
-- [ ] CODE-DX-NAMING: Abbreviated name obscures intent
-  OrderService.java:89 — variable named `flg` with no indication of purpose.
-  → Rename to something that expresses what the flag controls.
+Low:
 
-## Summary
+- `C:/projects/app/OrderService.java:89` [CODE-DX-NAMING] — Abbreviated name obscures intent; variable named `flg` with no indication of purpose. → Rename to something that expresses what the flag controls.
 
-Findings: 1 critical, 1 high, 1 medium, 1 low
-Active principles: CODE-SEC-VALIDATE-INPUT, CODE-CC-SYNC-SHARED-STATE, CODE-RL-IDEMPOTENCY, CODE-DX-NAMING, ...
+Summary: 1 critical, 1 high, 1 medium, 1 low
 Principle source: .principles hierarchy (2 files)
 
-## Fix Checklist
-
-- [ ] `OrderService.java:23` · HIGH · CODE-CC-SYNC-SHARED-STATE — unguarded shared counter → use AtomicInteger
-- [ ] `OrderService.java:89` · LOW · CODE-DX-NAMING — `flg` is unclear → rename to express intent
-- [ ] `PaymentClient.java:61` · MEDIUM · CODE-RL-IDEMPOTENCY — retry without idempotency key → add stable key
-- [ ] `UserRepository.java:47` · CRITICAL · CODE-SEC-VALIDATE-INPUT — SQL string concatenation → use PreparedStatement
+Generated: C:/projects/app/audit-output.json
 ```
 
 ## 🔧 Extending with your own principles
