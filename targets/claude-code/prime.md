@@ -87,7 +87,7 @@ Based on the context detected in Phase 1, activate principles across three layer
 
 ### Layer 1 — Always Active
 
-Seed the active set with the 14 Layer 1 universals from Phase 2.
+Seed the active set with the 25 Layer 1 universals from Phase 2.
 
 ### Layer 2 — Context-Dependent
 

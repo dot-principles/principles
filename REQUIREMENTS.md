@@ -8,13 +8,17 @@ Used by `install.sh` and `uninstall.sh`.
 
 | Platform | Status | How to get it |
 |----------|--------|---------------|
-| macOS    | Pre-installed | Ships with macOS via `/bin/bash`. For Bash 4+: `brew install bash` |
 | Linux    | Pre-installed | Available on all mainstream distributions |
-| Windows  | Requires setup | Install [Git for Windows](https://git-scm.com/download/win) (includes Git Bash) or enable WSL |
+| macOS    | Requires upgrade | Ships with Bash 3.2 (too old). Install Bash 4+: `brew install bash` |
+| Windows  | Requires setup | Install [Git for Windows](https://git-scm.com/download/win) (includes Git Bash), or enable WSL, or use MSYS2/Cygwin — any installation that puts `bash` on `PATH` works |
 
 Minimum version: **Bash 4.0** (for associative arrays and `set -euo pipefail`).
 
 Verify: `bash --version`
+
+### Windows wrapper scripts
+
+On Windows, use `install.ps1` / `uninstall.ps1` (PowerShell) or `install.cmd` / `uninstall.cmd` (Command Prompt) instead of calling `install.sh` directly. These wrappers detect bash on `PATH` and forward all arguments unchanged. See [INSTALL.md](INSTALL.md) for usage.
 
 ## AI Model
 

@@ -99,6 +99,17 @@ principles/
         yy-01.md
 ```
 
+### Pre-compiled context files
+
+Each namespace contains two pre-compiled files that consolidate all its principle guidance into a single read per command invocation:
+
+| File | Used by | Contains |
+|------|---------|----------|
+| `.context-prime.md` | `/prime` Phase 4 | Principle statement, Why it matters, Good practice — for all principles in the namespace |
+| `.context-audit.md` | `/audit` Phase 4 | Principle statement, Violations to detect — for all principles in the namespace |
+
+The command reads one file per namespace and filters to only the entries in the final active set. This avoids reading N individual principle files.
+
 ### `catalog.yaml` Schema
 
 Each namespace root must have a `catalog.yaml` with a single field:
@@ -364,13 +375,13 @@ Activates principles before writing code. Run it before starting work on a task.
 
 **Phases:**
 
-| Phase | Name                          | Description                                                                    |
-|-------|-------------------------------|--------------------------------------------------------------------------------|
-| 1     | Scan Context                  | Examines the coding context: language, framework, domain, risk signals         |
-| 2     | Resolve .principles Hierarchy | Walks to git root, expands groups, builds active ID set                        |
-| 3     | Dynamic Detection (fallback)  | Only runs if Phase 2 found no `.principles` files; uses signal-based detection |
-| 4     | Read Principle Content        | Reads actual `.md` files; extracts full guidance (Violations + Good Practice)  |
-| 5     | Output                        | Presents active principles table with source column; states coding frame       |
+| Phase | Name                          | Description                                                                                    |
+|-------|-------------------------------|------------------------------------------------------------------------------------------------|
+| 1     | Scan Context                  | Examines the coding context: language, framework, domain, risk signals                         |
+| 2     | Resolve .principles Hierarchy | Walks to git root, expands groups, builds active ID set                                        |
+| 3     | Dynamic Detection (fallback)  | Only runs if Phase 2 found no `.principles` files; uses signal-based detection                 |
+| 4     | Load Principle Content        | Reads one `.context-prime.md` per namespace (pre-compiled); filters to active IDs              |
+| 5     | Output                        | Presents active principles table with source column; states coding frame                       |
 
 ### 🔎 `/audit`
 
@@ -378,14 +389,14 @@ Reviews code against activated principles. Outputs findings grouped by severity.
 
 **Phases:**
 
-| Phase | Name                          | Description                                                                       |
-|-------|-------------------------------|-----------------------------------------------------------------------------------|
-| 1     | Resolve Input                 | Determines what code to review (file, directory, inline)                          |
-| 2     | Resolve .principles Hierarchy | Same walk algorithm as prime                                                      |
-| 3     | Dynamic Detection (fallback)  | Only if no `.principles` files found                                              |
-| 4     | Read Principle Content        | Reads `.md` files; uses "Violations to detect" sections                           |
-| 5     | Review                        | Applies each principle; groups findings by severity (Critical/High/Medium/Low)    |
-| 6     | Summary                       | Reports findings count; states principle source (hierarchy vs. dynamic detection) |
+| Phase | Name                          | Description                                                                                    |
+|-------|-------------------------------|------------------------------------------------------------------------------------------------|
+| 1     | Resolve Input                 | Determines what code to review (file, directory, inline)                                       |
+| 2     | Resolve .principles Hierarchy | Same walk algorithm as prime                                                                   |
+| 3     | Dynamic Detection (fallback)  | Only if no `.principles` files found                                                           |
+| 4     | Load Principle Content        | Reads one `.context-audit.md` per namespace (pre-compiled); filters to active IDs             |
+| 5     | Review                        | Applies each principle; groups findings by severity (Critical/High/Medium/Low)                 |
+| 6     | Output                        | Compact text report + `audit-output.json` written to repo root; reports principle source       |
 
 ### 🔍 `/scout`
 
@@ -407,34 +418,55 @@ Analyses a project directory and creates or updates `.principles` files.
 
 `install.sh` deploys the three commands (`/scout`, `/prime`, `/audit`) to three AI tool families. Each target writes different files because each tool family has its own discovery mechanism.
 
-**Prerequisites:** Bash 4+. See [REQUIREMENTS.md](REQUIREMENTS.md).
+**Prerequisites:** Bash 4+. See [REQUIREMENTS.md](REQUIREMENTS.md). On Windows, use `install.ps1` (PowerShell) or `install.cmd` (CMD) — thin wrappers that detect bash and forward all arguments to `install.sh`. See [INSTALL.md](INSTALL.md) for platform-specific instructions.
 
-### 🤖 Claude Code (`./install.sh claude`)
+Every target supports two scopes — **global** (no directory argument) applies across all projects, **local** (with a directory argument) applies to a single project:
 
-Writes to `~/.claude/commands/<name>.md` (global, user-level).
+| Command | Scope | Where |
+|---|---|---|
+| `./install.sh claude` | Global | `~/.claude/commands/` |
+| `./install.sh claude <dir>` | Local | `<dir>/.claude/commands/` |
+| `./install.sh copilot` | Global | `~/.copilot/copilot-instructions.md` |
+| `./install.sh copilot <dir>` | Local | `<dir>/.github/` |
+| `./install.sh cursor` | — | Not supported (see below) |
+| `./install.sh cursor <dir>` | Local | `<dir>/.cursor/rules/code-principles.mdc` |
+| `./install.sh all` | Global | Claude + Copilot globally; Cursor message |
+| `./install.sh all <dir>` | Local | All three tools in `<dir>` |
+| `./install.sh --list` | — | Reports what is currently installed globally |
 
-Claude Code discovers slash commands by scanning `~/.claude/commands/` for `.md` files. The file body is the full prompt. No frontmatter is required.
+### 🤖 Claude Code (`./install.sh claude [dir]`)
 
-### 🐙 GitHub Copilot (`./install.sh copilot <dir>`)
+Copies `targets/claude-code/*.md` to the commands directory.
 
-Writes two sets of files per command, because Copilot has two separate client families:
+Claude Code discovers slash commands by scanning `~/.claude/commands/` (global) or `<dir>/.claude/commands/` (local) for `.md` files. The file body is the full prompt. No frontmatter is required.
+
+### 🐙 GitHub Copilot (`./install.sh copilot [dir]`)
+
+**Global** (`copilot` with no argument): writes `~/.copilot/copilot-instructions.md` with the Layer 1–3 principle summary. This is consumed by all Copilot clients as always-on background context.
+
+**Local** (`copilot <dir>`): writes three sets of files:
 
 | File | Location | Consumed by |
 |------|----------|-------------|
-| `SKILL.md` | `.github/skills/<name>/SKILL.md` | **Copilot CLI** (terminal) |
-| `<name>.prompt.md` | `.github/prompts/<name>.prompt.md` | **VS Code / JetBrains / Visual Studio** (IDEs) |
+| `copilot-instructions.md` | `.github/copilot-instructions.md` | All Copilot clients (always-on context) |
+| `SKILL.md` | `.github/skills/<name>/SKILL.md` | **Copilot CLI** (terminal slash commands) |
+| `<name>.prompt.md` | `.github/prompts/<name>.prompt.md` | **VS Code / JetBrains / Visual Studio** (IDE chat) |
 
 **Skills** (`.github/skills/<name>/SKILL.md`) are the CLI mechanism. The Copilot CLI scans `.github/skills/` at startup, reads each `SKILL.md`, and exposes the skill as a `/skill-name` slash command. Skills require a YAML frontmatter with `name` and `description`; the `description` is also used by Copilot to decide when to invoke the skill automatically.
 
 **Prompt files** (`.github/prompts/<name>.prompt.md`) are the IDE mechanism. Copilot Chat in VS Code, JetBrains, and Visual Studio discovers `.prompt.md` files in `.github/prompts/` and exposes them as slash commands in the chat panel. They require at minimum a `description:` field in YAML frontmatter.
 
-Also writes `.github/copilot-instructions.md` with the Layer 1–3 principle summary. This file is consumed by all Copilot clients (CLI and IDEs) as always-on background context.
-
 ### 🖱️ Cursor (`./install.sh cursor <dir>`)
 
-Writes to `.cursor/rules/code-principles.mdc`.
+Writes to `<dir>/.cursor/rules/code-principles.mdc`.
 
 Cursor discovers rules by scanning `.cursor/rules/` for `.mdc` files. The frontmatter `alwaysApply: true` makes the rule active in all contexts.
+
+**Cursor limitation:** Cursor has no file-based user-level config. Global principles require manual setup via **Cursor → Settings → General → Rules for AI**.
+
+### 🗑️ Uninstall (`./uninstall.sh [dir]`)
+
+Removes the assets written by `install.sh`. Without an argument, removes global assets. With a directory argument, removes local assets from that project. On Windows, use `uninstall.ps1` or `uninstall.cmd`.
 
 ---
 

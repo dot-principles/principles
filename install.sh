@@ -21,6 +21,19 @@ set -euo pipefail
 #   ./uninstall.sh                   # Remove global assets
 #   ./uninstall.sh <dir>             # Remove local assets from <dir>
 
+# Convert a Windows-style path (C:\... or C:/...) to a path the current bash understands.
+# Under WSL, uses wslpath. Under Git Bash / native Linux/macOS, returns the path unchanged.
+normalize_path() {
+    local p="$1"
+    if [[ -n "$p" && "$p" =~ ^[A-Za-z]:[/\\] ]]; then
+        if command -v wslpath &>/dev/null; then
+            wslpath -u "$p"
+            return
+        fi
+    fi
+    printf '%s' "$p"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_COMMANDS_DIR="$HOME/.claude/commands"
 CLAUDE_TARGETS_DIR="$SCRIPT_DIR/targets/claude-code"
@@ -405,22 +418,24 @@ show_usage() {
 # Main
 print_header
 
+DIR_ARG="$(normalize_path "${2:-}")"
+
 case "${1:-}" in
     claude)
-        install_claude "${2:-}"
+        install_claude "$DIR_ARG"
         ;;
     copilot)
-        install_copilot "${2:-}"
+        install_copilot "$DIR_ARG"
         ;;
     cursor)
-        install_cursor "${2:-}"
+        install_cursor "$DIR_ARG"
         ;;
     all)
-        install_claude "${2:-}"
+        install_claude "$DIR_ARG"
         echo ""
-        install_copilot "${2:-}"
+        install_copilot "$DIR_ARG"
         echo ""
-        install_cursor "${2:-}"
+        install_cursor "$DIR_ARG"
         ;;
     --list|-l)
         list_installed

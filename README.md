@@ -217,8 +217,11 @@ The AI figures out the scope from context:
 # Clone the repo
 git clone https://github.com/code-principles/.principles.git
 
-# Install Claude Code slash commands
+# Install Claude Code slash commands globally
 ./install.sh claude
+
+# Or install locally into a single project
+./install.sh claude <dir>
 
 # Use it — in Claude Code:
 #   /scout                      → detect profile and create .principles files
@@ -227,31 +230,7 @@ git clone https://github.com/code-principles/.principles.git
 #   /audit directory            → review whatever you describe in conversation
 ```
 
-For GitHub Copilot, run `./install.sh copilot <project-dir>`. This writes:
-
-- `.github/copilot-instructions.md` for clients that consume Copilot instructions, including Copilot CLI
-- `.github/prompts/*.prompt.md` for GitHub Copilot clients that support prompt-file slash commands
-
-The prompt files need YAML frontmatter to be discoverable. `install.sh copilot` now generates valid prompt files, but command visibility still depends on the Copilot client you use.
-
-## 🌐 Installation scopes
-
-Every tool supports two installation scopes — **global** (no directory argument) applies across all your repos, **local** (with a directory argument) applies to a single project only:
-
-| Command | Scope | Where |
-|---|---|---|
-| `./install.sh claude` | Global | `~/.claude/commands/` |
-| `./install.sh claude <dir>` | Local | `<dir>/.claude/commands/` |
-| `./install.sh copilot` | Global | `~/.copilot/copilot-instructions.md` |
-| `./install.sh copilot <dir>` | Local | `<dir>/.github/` (instructions + skills + prompts) |
-| `./install.sh cursor` | — | Not supported (see below) |
-| `./install.sh cursor <dir>` | Local | `<dir>/.cursor/rules/code-principles.mdc` |
-| `./install.sh all` | Global | Claude + Copilot globally; Cursor message |
-| `./install.sh all <dir>` | Local | All three tools in `<dir>` |
-
-**Cursor limitation:** Cursor has no file-based user-level config. To apply principles globally, go to Cursor > Settings > General > Rules for AI and paste the principle content there manually.
-
-**Breaking change:** `./install.sh copilot` (no argument) previously defaulted to the current directory. It now installs globally to `~/.copilot/copilot-instructions.md`. To install locally as before, pass the directory explicitly: `./install.sh copilot .`
+See [INSTALL.md](INSTALL.md) for full platform instructions (Linux, macOS, Windows), all supported tools, and how to try it on a branch before committing.
 
 ## 📚 Principle catalog
 

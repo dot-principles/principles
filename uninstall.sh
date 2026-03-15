@@ -17,6 +17,19 @@ set -euo pipefail
 #                              #   Cursor:      .cursor/rules/code-principles.mdc
 #   ./uninstall.sh --help      # Show this help
 
+# Convert a Windows-style path (C:\... or C:/...) to a path the current bash understands.
+# Under WSL, uses wslpath. Under Git Bash / native Linux/macOS, returns the path unchanged.
+normalize_path() {
+    local p="$1"
+    if [[ -n "$p" && "$p" =~ ^[A-Za-z]:[/\\] ]]; then
+        if command -v wslpath &>/dev/null; then
+            wslpath -u "$p"
+            return
+        fi
+    fi
+    printf '%s' "$p"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_COMMANDS_DIR="$HOME/.claude/commands"
 CLAUDE_TARGETS_DIR="$SCRIPT_DIR/targets/claude-code"
@@ -25,7 +38,7 @@ UNINSTALL_SCOPE="global"
 PROJECT_DIR=""
 if [ -n "${1:-}" ] && [[ "${1:-}" != --* ]]; then
     UNINSTALL_SCOPE="local"
-    PROJECT_DIR="$1"
+    PROJECT_DIR="$(normalize_path "$1")"
 fi
 
 # Colors (if terminal supports them)

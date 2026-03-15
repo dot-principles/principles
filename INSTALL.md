@@ -1,0 +1,177 @@
+# Installation
+
+This guide covers installing `.principles` on Linux, macOS, and Windows.
+
+---
+
+## Prerequisites
+
+- **Bash 4+** — required by `install.sh` / `uninstall.sh`
+- **AI model** — Claude Haiku 4.5+, GPT-4.1+, or equivalent
+
+See [REQUIREMENTS.md](REQUIREMENTS.md) for platform-specific setup and model compatibility details.
+
+---
+
+## 1. Clone the repo
+
+```bash
+git clone https://github.com/code-principles/.principles.git
+cd .principles
+```
+
+---
+
+## 2. Install
+
+### Linux / macOS
+
+Bash is pre-installed on both platforms. Run the installer directly:
+
+```bash
+# Claude Code — global (all projects)
+./install.sh claude
+
+# Claude Code — local (one project)
+./install.sh claude ~/projects/my-app
+
+# GitHub Copilot — global
+./install.sh copilot
+
+# GitHub Copilot — local (one project)
+./install.sh copilot ~/projects/my-app
+
+# Cursor — local only (global requires manual setup in Cursor settings)
+./install.sh cursor ~/projects/my-app
+
+# All tools — global
+./install.sh all
+
+# All tools — local
+./install.sh all ~/projects/my-app
+```
+
+---
+
+### Windows
+
+Windows users need bash on `PATH`. The repo ships thin wrapper scripts for both PowerShell and Command Prompt that detect bash and forward all arguments to the real `install.sh`.
+
+**Step 1 — get bash.** Install [Git for Windows](https://git-scm.com/download/win) (includes Git Bash). WSL, MSYS2, and Cygwin also work as long as `bash` is on `PATH`.
+
+**Step 2 — run the wrapper.**
+
+**PowerShell:**
+
+```powershell
+# Claude Code — global
+.\install.ps1 claude
+
+# Claude Code — local
+.\install.ps1 claude ~/projects/my-app
+
+# GitHub Copilot — global
+.\install.ps1 copilot
+
+# GitHub Copilot — local
+.\install.ps1 copilot ~/projects/my-app
+
+# Cursor — local only
+.\install.ps1 cursor ~/projects/my-app
+
+# All tools — global
+.\install.ps1 all
+
+# All tools — local
+.\install.ps1 all ~/projects/my-app
+```
+
+**Command Prompt:**
+
+```cmd
+install.cmd claude
+install.cmd claude ~/projects/my-app
+install.cmd copilot
+install.cmd copilot ~/projects/my-app
+install.cmd cursor ~/projects/my-app
+install.cmd all ~/projects/my-app
+```
+
+> **Path note:** `install.cmd` / `uninstall.cmd` automatically convert backslashes to forward slashes in all arguments, so `C:\My\Path` and `C:/My/Path` both work. PowerShell passes arguments directly and does not need conversion.
+
+---
+
+## 3. Installation scopes
+
+Every tool supports two scopes:
+
+| Command | Scope | Where it installs |
+|---|---|---|
+| `install.sh claude` | Global | `~/.claude/commands/` |
+| `install.sh claude <dir>` | Local | `<dir>/.claude/commands/` |
+| `install.sh copilot` | Global | `~/.copilot/copilot-instructions.md` |
+| `install.sh copilot <dir>` | Local | `<dir>/.github/` (instructions + skills + prompts) |
+| `install.sh cursor` | — | Not supported (see Cursor note below) |
+| `install.sh cursor <dir>` | Local | `<dir>/.cursor/rules/code-principles.mdc` |
+| `install.sh all` | Global | Claude + Copilot globally; Cursor message |
+| `install.sh all <dir>` | Local | All three tools in `<dir>` |
+
+**Cursor limitation:** Cursor has no file-based user-level config. For global principles, go to **Cursor → Settings → General → Rules for AI** and paste the principle content there manually. For a single project, use `install.sh cursor <dir>`.
+
+---
+
+## 4. Verify
+
+```bash
+./install.sh --list
+```
+
+Shows what is currently installed globally.
+
+---
+
+## 5. Uninstall
+
+```bash
+# Remove global assets
+./uninstall.sh
+
+# Remove local assets from a project
+./uninstall.sh ~/projects/my-app
+```
+
+On Windows, use `uninstall.ps1` or `uninstall.cmd` with the same arguments.
+
+---
+
+## 6. Try it on a branch first
+
+Not ready to commit to a project? Install locally into a throwaway branch:
+
+```bash
+cd ~/projects/my-app
+git checkout -b try-principles
+
+# Install into this project directory only
+/path/to/.principles/install.sh claude .
+# or on Windows:
+# \path\to\.principles\install.ps1 claude .
+
+# Run /scout, /prime, /audit — explore without touching your main branch
+# When done, delete the branch to remove the local .claude/commands/
+git checkout main && git branch -D try-principles
+```
+
+Local installs write only into `<dir>/.claude/commands/` (or `.github/`, `.cursor/rules/`) — they leave your global setup untouched and disappear with the branch.
+
+## 7. After installing
+
+Open your AI tool and run the commands:
+
+```
+/scout     → detect project profile and create .principles files
+/prime     → activate principles before writing code
+/audit     → review code with severity-categorized findings
+```
+
+See [README.md](README.md) for a full walkthrough and examples.
