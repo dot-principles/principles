@@ -486,7 +486,7 @@ Every target supports two scopes — **global** (no directory argument) applies 
 | `./install.sh copilot` | Global | `~/.copilot/copilot-instructions.md` |
 | `./install.sh copilot <dir>` | Local | `<dir>/.github/` |
 | `./install.sh cursor` | — | Not supported (see below) |
-| `./install.sh cursor <dir>` | Local | `<dir>/.cursor/rules/code-principles.mdc` |
+| `./install.sh cursor <dir>` | Local | `<dir>/.cursor/rules/principles.mdc` |
 | `./install.sh all` | Global | Claude + Copilot globally; Cursor message |
 | `./install.sh all <dir>` | Local | All three tools in `<dir>` |
 | `./install.sh --list` | — | Reports what is currently installed globally |
@@ -521,7 +521,7 @@ This repo ships with pre-populated `.github/prompts/` and `.github/skills/` dire
 
 ### 🖱️ Cursor (`./install.sh cursor <dir>`)
 
-Writes to `<dir>/.cursor/rules/code-principles.mdc`.
+Writes to `<dir>/.cursor/rules/principles.mdc`.
 
 Cursor discovers rules by scanning `.cursor/rules/` for `.mdc` files. The frontmatter `alwaysApply: true` makes the rule active in all contexts.
 

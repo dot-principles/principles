@@ -105,16 +105,16 @@ install.cmd all ~/projects/my-app
 
 Every tool supports two scopes:
 
-| Command                    | Scope  | Where it installs                                  |
-|----------------------------|--------|----------------------------------------------------|
-| `install.sh claude`        | Global | `~/.claude/commands/`                              |
-| `install.sh claude <dir>`  | Local  | `<dir>/.claude/commands/`                          |
-| `install.sh copilot`       | Global | `~/.copilot/copilot-instructions.md`               |
+| Command                    | Scope  | Where it installs                             |
+|----------------------------|--------|-----------------------------------------------|
+| `install.sh claude`        | Global | `~/.claude/commands/`                         |
+| `install.sh claude <dir>`  | Local  | `<dir>/.claude/commands/`                     |
+| `install.sh copilot`       | Global | `~/.copilot/copilot-instructions.md`          |
 | `install.sh copilot <dir>` | Local  | `<dir>/.github/` (instructions + skills + prompts) |
-| `install.sh cursor`        | —      | Not supported (see Cursor note below)              |
-| `install.sh cursor <dir>`  | Local  | `<dir>/.cursor/rules/code-principles.mdc`          |
-| `install.sh all`           | Global | Claude + Copilot globally; Cursor message          |
-| `install.sh all <dir>`     | Local  | All three tools in `<dir>`                         |
+| `install.sh cursor`        | —      | Not supported (see Cursor note below)         |
+| `install.sh cursor <dir>`  | Local  | `<dir>/.cursor/rules/principles.mdc`          |
+| `install.sh all`           | Global | Claude + Copilot globally; Cursor message     |
+| `install.sh all <dir>`     | Local  | All three tools in `<dir>`                    |
 
 ### Claude Code — global commands work everywhere
 
