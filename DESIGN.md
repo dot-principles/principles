@@ -493,7 +493,11 @@ Every target supports two scopes — **global** (no directory argument) applies 
 
 ### 🤖 Claude Code (`./install.sh claude [dir]`)
 
-Copies `targets/claude-code/*.md` to the commands directory.
+Copies `targets/claude-code/*.md` to the commands directory, substituting the `{{PRINCIPLES_DIRECTORY}}` placeholder with the data directory path.
+
+**Data directory (`~/.principles`):** Every Claude install (global or local) also copies `groups/` and `principles/` from the repo into `~/.principles` (`%USERPROFILE%\.principles` on Windows). This is done via `install_data()` before the command files are written. The data directory is refreshed on every install — old files are removed and current repo files are copied in.
+
+**Placeholder substitution:** The source files in `targets/claude-code/` contain the literal string `{{PRINCIPLES_DIRECTORY}}` wherever they reference the data catalog. `install.sh` runs `sed "s|{{PRINCIPLES_DIRECTORY}}|$DATA_DIR|g"` when writing to the commands directory, so the installed copies always reference the correct absolute path. The placeholder is left untouched in the source files.
 
 Claude Code discovers slash commands by scanning `~/.claude/commands/` (global) or `<dir>/.claude/commands/` (local) for `.md` files. The file body is the full prompt. No frontmatter is required.
 
@@ -525,7 +529,7 @@ Cursor discovers rules by scanning `.cursor/rules/` for `.mdc` files. The frontm
 
 ### 🗑️ Uninstall (`./uninstall.sh [dir]`)
 
-Removes the assets written by `install.sh`. Without an argument, removes global assets. With a directory argument, removes local assets from that project. On Windows, use `uninstall.ps1` or `uninstall.cmd`.
+Removes the assets written by `install.sh`. Without an argument, removes global assets — command files from `~/.claude/commands/` and the `~/.principles` data directory. With a directory argument, removes local assets from that project only; the shared data directory is left intact. On Windows, use `uninstall.ps1` or `uninstall.cmd`.
 
 ---
 

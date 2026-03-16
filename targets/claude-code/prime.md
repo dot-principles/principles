@@ -71,7 +71,7 @@ Seed the active set with these universally-active principles:
 For each `.principles` file encountered:
 
 1. Skip blank lines and `#` comment lines
-2. For each `@group` entry: read `{{CODE_PRINCIPLES_REPO}}/groups/<group>.yaml`, expand its `principles` list into the active set. Recursively process any `includes` entries (detect and abort on cycles).
+2. For each `@group` entry: read `{{PRINCIPLES_DIRECTORY}}/groups/<group>.yaml`, expand its `principles` list into the active set. Recursively process any `includes` entries (detect and abort on cycles).
 3. For each bare `ID` entry: add the ID to the active set (case-insensitive)
 4. For each `!ID` entry: add the ID to an exclusion set
 
@@ -179,7 +179,7 @@ Determine the namespaces present in the active ID set (e.g. `CODE`, `CORP` → n
 
 For each namespace, read its single pre-compiled context file:
 ```
-{{CODE_PRINCIPLES_REPO}}/principles/<namespace>/.context-prime.md
+{{PRINCIPLES_DIRECTORY}}/principles/<namespace>/.context-prime.md
 ```
 
 Each entry in the file has this form:

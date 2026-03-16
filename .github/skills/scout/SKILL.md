@@ -82,7 +82,7 @@ Based on the profile map from Phase 2, propose where to place `.principles` file
 1. **Git root `.principles`**: Activate groups that apply to the whole project
 2. **Subdirectory `.principles`**: Activate additional groups or exclude principles that don't apply to that subtree
 
-### Available groups (from `{{CODE_PRINCIPLES_REPO}}/groups/`)
+### Available groups (from `{{PRINCIPLES_DIRECTORY}}/groups/`)
 
 Reference these groups by their filename (without `.yaml`):
 
@@ -90,7 +90,7 @@ Reference these groups by their filename (without `.yaml`):
 **Framework groups:** `spring-boot`, `spring-data-jpa`, `react`, `angular`, `django`, `fastapi`
 **Cross-cutting groups:** `microservices`, `security-focused`
 
-Also list any custom groups found in `{{CODE_PRINCIPLES_REPO}}/groups/` that aren't listed above.
+Also list any custom groups found in `{{PRINCIPLES_DIRECTORY}}/groups/` that aren't listed above.
 
 ### Proposal format
 

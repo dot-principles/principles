@@ -49,6 +49,7 @@ resolve_home() {
     fi
 }
 EFFECTIVE_HOME="$(resolve_home)"
+DATA_DIR="$EFFECTIVE_HOME/.principles"
 
 CLAUDE_COMMANDS_DIR="$EFFECTIVE_HOME/.claude/commands"
 CLAUDE_TARGETS_DIR="$SCRIPT_DIR/targets/claude-code"
@@ -107,6 +108,13 @@ show_usage() {
     echo "  --help              Show this help"
 }
 
+uninstall_data() {
+    if [ -d "$DATA_DIR" ]; then
+        rm -rf "$DATA_DIR"
+        echo -e "  ${GREEN}✓${NC} Removed $DATA_DIR"
+    fi
+}
+
 uninstall_claude() {
     local project_dir="${1:-}"
     local target_dir
@@ -153,6 +161,10 @@ uninstall_claude() {
     if [ -n "$project_dir" ]; then
         cleanup_dir_if_empty "$target_dir"
         cleanup_dir_if_empty "$project_dir/.claude"
+    else
+        echo ""
+        echo -e "${BOLD}Removing .principles data...${NC}"
+        uninstall_data
     fi
 }
 

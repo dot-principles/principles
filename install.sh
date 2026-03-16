@@ -37,6 +37,7 @@ normalize_path() {
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Resolve the home directory for global asset installation.
+# (defined before DATA_DIR so resolve_home() is available)
 # When invoked via WSL (e.g. PowerShell 7 finds the WSL bash instead of Git
 # Bash), $HOME is the Linux home (/home/<user>) but assets must go to the
 # Windows user profile so that Windows tools (Copilot, Claude Code) find them.
@@ -53,6 +54,7 @@ resolve_home() {
     fi
 }
 EFFECTIVE_HOME="$(resolve_home)"
+DATA_DIR="$EFFECTIVE_HOME/.principles"
 
 CLAUDE_COMMANDS_DIR="$EFFECTIVE_HOME/.claude/commands"
 CLAUDE_TARGETS_DIR="$SCRIPT_DIR/targets/claude-code"
@@ -167,6 +169,16 @@ EOF
     cat "$source_file" >> "$prompt_file"
 }
 
+install_data() {
+    echo -e "${BOLD}Installing .principles data...${NC}"
+    rm -rf "$DATA_DIR/groups" "$DATA_DIR/principles"
+    mkdir -p "$DATA_DIR"
+    cp -r "$SCRIPT_DIR/groups"     "$DATA_DIR/"
+    cp -r "$SCRIPT_DIR/principles" "$DATA_DIR/"
+    echo -e "  ${GREEN}✓${NC} $DATA_DIR"
+    echo ""
+}
+
 install_claude() {
     local project_dir="${1:-}"
     local target_dir
@@ -182,12 +194,13 @@ install_claude() {
         echo -e "${BOLD}Installing Claude Code slash commands (global)...${NC}"
     fi
 
+    install_data
     mkdir -p "$target_dir"
 
     local count=0
     for file in "$CLAUDE_TARGETS_DIR/"*.md; do
         if [ -f "$file" ]; then
-            cp "$file" "$target_dir/"
+            sed "s|{{PRINCIPLES_DIRECTORY}}|$DATA_DIR|g" "$file" > "$target_dir/$(basename "$file")"
             count=$((count + 1))
             echo -e "  ${GREEN}✓${NC} /$(basename "$file" .md)"
         fi
@@ -219,6 +232,7 @@ install_copilot_local() {
         exit 1
     fi
 
+    install_data
     echo -e "${BOLD}Generating Copilot instructions for: $project_dir${NC}"
 
     local target_dir="$project_dir/.github"
@@ -277,6 +291,7 @@ install_copilot_local() {
             local patched_file
             patched_file="$(mktemp)"
             sed \
+                -e "s|{{PRINCIPLES_DIRECTORY}}|$DATA_DIR|g" \
                 -e 's|~/.claude/audit-output\.json|.github/scripts/audit-output.json|g' \
                 "$file" > "$patched_file"
             write_copilot_prompt "$patched_file" "$prompt_file" "$command_name"
@@ -302,6 +317,7 @@ install_copilot_global() {
     local target_dir="$EFFECTIVE_HOME/.copilot"
     local target_file="$target_dir/copilot-instructions.md"
 
+    install_data
     echo -e "${BOLD}Generating global Copilot instructions (~/.copilot/copilot-instructions.md)...${NC}"
     mkdir -p "$target_dir"
 

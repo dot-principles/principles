@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+
+- **Installer now copies principle data to `~/.principles`** — `install.sh` creates a fixed well-known data directory (`~/.principles` on Linux/macOS/Windows Git Bash; `%USERPROFILE%\.principles` on Windows) and copies `groups/` and `principles/` into it on every install. The directory is refreshed (old files removed, new files copied) on every run, so updates are always in sync.
+- **`{{PRINCIPLES_DIRECTORY}}` placeholder resolved at installation time** — The Claude Code command files (`audit.md`, `prime.md`, `scout.md`) contain `{{PRINCIPLES_DIRECTORY}}` as a placeholder for the data directory. `install.sh` now substitutes this with the actual `~/.principles` path via `sed` when writing to `~/.claude/commands/`. The placeholder remains in the source files; only the installed copies are rewritten.
+- **`uninstall.sh` removes `~/.principles` on global uninstall** — Running `./uninstall.sh` (no argument) now deletes `~/.principles` in addition to the command files. Local uninstalls (`./uninstall.sh <dir>`) leave the data directory intact, since it is shared across all installations.
+
 ### Added
 
 - **14 new database / persistence principles** — new namespace `db`:

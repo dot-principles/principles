@@ -146,6 +146,19 @@ This writes into `.github/` inside that project:
 | `.github/skills/scout/SKILL.md`   | `/scout` in Copilot CLI                      |
 Commit these files to the repository so every team member gets the commands automatically.
 
+### Principles data directory
+
+Every Claude install (global or local) copies the `groups/` and `principles/` data files to `~/.principles`:
+
+| Platform                 | Path                        |
+|--------------------------|-----------------------------|
+| Linux / macOS            | `~/.principles`             |
+| Windows (Git Bash / WSL) | `%USERPROFILE%\.principles` |
+
+The data directory is **created or refreshed on every install** — old files are replaced with the current repo content. The installed command files (`/scout`, `/prime`, `/audit`) reference this fixed path, so the AI tool can always find the data regardless of where the repo lives.
+
+Running `./uninstall.sh` (global) removes `~/.principles` along with the command files. Local uninstalls (`./uninstall.sh <dir>`) do not remove it, since it is shared across all installations.
+
 ### Cursor limitation
 
 Cursor has no file-based user-level config. For global principles, go to **Cursor → Settings → General → Rules for AI** and paste the principle content there manually. For a single project, use `install.sh cursor <dir>`.

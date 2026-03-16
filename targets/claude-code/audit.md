@@ -61,7 +61,7 @@ Lines starting with `:` are configuration directives. Parse them before processi
 
 1. Skip blank lines and `#` comments.
 2. `:directive value` → parse as a configuration directive (see above).
-3. `@group` → read `{{CODE_PRINCIPLES_REPO}}/groups/<group>.yaml`, expand `principles` into the active set; recursively process `includes` (abort on cycles).
+3. `@group` → read `{{PRINCIPLES_DIRECTORY}}/groups/<group>.yaml`, expand `principles` into the active set; recursively process `includes` (abort on cycles).
 4. Bare `ID` → add to active set (case-insensitive).
 5. `!ID` → add to exclusion set.
 
@@ -155,7 +155,7 @@ Elevate: CODE-CS-DRY, CODE-CS-YAGNI, SIMPLE-DESIGN-PASSES-TESTS, SIMPLE-DESIGN-R
 For each namespace in the active ID set, read one file:
 
 ```
-{{CODE_PRINCIPLES_REPO}}/principles/<namespace>/.context-audit.md
+{{PRINCIPLES_DIRECTORY}}/principles/<namespace>/.context-audit.md
 ```
 
 Filter to entries whose `### ID` is in the final active set. Use the **Principle** and **Violations to detect** content in Phase 6.
@@ -171,7 +171,7 @@ Run deterministic, machine-executable commands to narrow the search space before
 For each namespace in the active ID set, check for:
 
 ```
-{{CODE_PRINCIPLES_REPO}}/principles/<namespace>/.context-inspect.md
+{{PRINCIPLES_DIRECTORY}}/principles/<namespace>/.context-inspect.md
 ```
 
 Filter to entries whose `### ID` is in the final active set. Each entry contains one or more commands in this format:
