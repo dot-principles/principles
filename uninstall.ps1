@@ -6,28 +6,34 @@
     All arguments are forwarded to uninstall.sh unchanged.
     Use forward slashes or relative paths for directory arguments.
 .EXAMPLE
-    .\uninstall.ps1 claude
-    .\uninstall.ps1 copilot ~/projects/my-app
-    .\uninstall.ps1 all .
+    .\uninstall.ps1
+    .\uninstall.ps1 ~/projects/my-app
 #>
 
-bash --version 2>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) {
+if (-not (Get-Command bash -ErrorAction SilentlyContinue)) {
     Write-Error 'bash not found. Install Git for Windows: https://git-scm.com/download/win'
     exit 1
 }
 
-$fixedArgs = $args | ForEach-Object {
-    if ($_ -match '^([A-Za-z]):[/\\](.*)$') {
-        $drive = $Matches[1].ToLower()
-        $rest  = $Matches[2] -replace '\\', '/'
-        if (Get-Command wsl -ErrorAction SilentlyContinue) { "/mnt/$drive/$rest" }
-        else { "/$drive/$rest" }
-    } else { $_ }
+$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+
+# Detect whether bash is Git Bash (pc-msys/mingw) or WSL (linux-gnu).
+# WSL bash does not inherit PowerShell environment variables, so we must
+# inject the Windows home directory inline via the command string.
+$bashVersion = bash --version 2>&1 | Select-Object -First 1
+$isWSL = $bashVersion -notmatch 'msys|mingw'
+
+Push-Location $scriptDir
+try {
+    if ($isWSL) {
+        $winHome = ($env:USERPROFILE -replace '\\', '/') -replace "'", "'\''"
+        $quotedArgs = ($args | ForEach-Object { "'" + ($_ -replace "'", "'\\''") + "'" }) -join ' '
+        bash -c "PRINCIPLES_WIN_HOME='$winHome' bash uninstall.sh $quotedArgs"
+    } else {
+        & bash uninstall.sh @args
+    }
+    $exit = $LASTEXITCODE
+} finally {
+    Pop-Location
 }
-$safeArgs = $fixedArgs | ForEach-Object { "'" + ($_ -replace "'", "'\\''") + "'" }
-Push-Location $PSScriptRoot
-bash -c "bash uninstall.sh $($safeArgs -join ' ')"
-$exit = $LASTEXITCODE
-Pop-Location
 exit $exit

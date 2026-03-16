@@ -31,7 +31,26 @@ normalize_path() {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE_COMMANDS_DIR="$HOME/.claude/commands"
+
+# Resolve the home directory for global asset removal.
+# When invoked via WSL (e.g. PowerShell 7 finds the WSL bash instead of Git
+# Bash), $HOME is the Linux home (/home/<user>) but assets live in the
+# Windows user profile where they were installed.
+resolve_home() {
+    if [ -n "${PRINCIPLES_WIN_HOME:-}" ]; then
+        # Set by uninstall.ps1 — Windows USERPROFILE with forward slashes.
+        # normalize_path converts it to a bash-usable path (wslpath under WSL,
+        # pass-through under Git Bash which natively handles C:/... paths).
+        normalize_path "$PRINCIPLES_WIN_HOME"
+    elif command -v wslpath &>/dev/null && [ -n "${USERPROFILE:-}" ]; then
+        wslpath -u "$USERPROFILE"
+    else
+        echo "$HOME"
+    fi
+}
+EFFECTIVE_HOME="$(resolve_home)"
+
+CLAUDE_COMMANDS_DIR="$EFFECTIVE_HOME/.claude/commands"
 CLAUDE_TARGETS_DIR="$SCRIPT_DIR/targets/claude-code"
 
 UNINSTALL_SCOPE="global"
@@ -233,7 +252,7 @@ uninstall_copilot_local() {
 }
 
 uninstall_copilot_global() {
-    local target_file="$HOME/.copilot/copilot-instructions.md"
+    local target_file="$EFFECTIVE_HOME/.copilot/copilot-instructions.md"
 
     echo -e "${BOLD}Removing global Copilot instructions...${NC}"
 
@@ -268,7 +287,7 @@ uninstall_copilot_global() {
         echo -e "  ${GREEN}✓${NC} ~/.copilot/copilot-instructions.md"
     fi
 
-    cleanup_dir_if_empty "$HOME/.copilot"
+    cleanup_dir_if_empty "$EFFECTIVE_HOME/.copilot"
 }
 
 uninstall_cursor() {
