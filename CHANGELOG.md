@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
+- **27 new OOP/object-design principles** across 6 namespaces:
+  - **`pkg/` namespace** (new) — Robert Martin's 6 Package/Component Principles: `PKG-REP`, `PKG-CCP`, `PKG-CRP`, `PKG-ADP`, `PKG-SDP`, `PKG-SAP`; new `@pkg` group
+  - **`gof/`** — `GOF-LAW-OF-DEMETER` (Law of Demeter, IEEE 1989), `GOF-NULL-OBJECT` (Woolf / Fowler)
+  - **`code/cs/`** — `CODE-CS-DESIGN-BY-CONTRACT` (Meyer), `CODE-CS-TELL-DONT-ASK` (Hunt & Thomas), `CODE-CS-INFORMATION-HIDING` (Parnas 1972), `CODE-CS-UNIFORM-ACCESS` (Meyer)
+  - **`code-smells/`** — 9 missing Fowler smells: `CODE-SMELLS-LONG-PARAMETER-LIST`, `CODE-SMELLS-DIVERGENT-CHANGE`, `CODE-SMELLS-SHOTGUN-SURGERY`, `CODE-SMELLS-REFUSED-BEQUEST`, `CODE-SMELLS-INSIDER-TRADING`, `CODE-SMELLS-DATA-CLASS`, `CODE-SMELLS-TEMPORARY-FIELD`, `CODE-SMELLS-ALTERNATIVE-CLASSES`, `CODE-SMELLS-GLOBAL-DATA`
+  - **`effective-java/`** — 5 new items: `EFFECTIVE-JAVA-PREFER-DEPENDENCY-INJECTION` (Item 5), `EFFECTIVE-JAVA-OVERRIDE-EQUALS-CONTRACT` (Items 10/11), `EFFECTIVE-JAVA-DESIGN-FOR-INHERITANCE` (Item 19), `EFFECTIVE-JAVA-PREFER-INTERFACES` (Item 20), `EFFECTIVE-JAVA-DESIGN-INTERFACES-FOR-POSTERITY` (Item 21)
+  - **`ddd/`** — `DDD-SPECIFICATION` (Evans / Fowler)
+- All affected `.context-audit.md` and `.context-prime.md` files updated
+- All affected `groups/` YAML files updated
+
 - **`fp` namespace** — 20 functional programming principles covering the full FP spectrum:
   - **Layer 1 (universal):** `FP-PURE-FUNCTIONS`, `FP-REFERENTIAL-TRANSPARENCY`, `FP-IMMUTABILITY`, `FP-AVOID-SHARED-MUTABLE-STATE`
   - **Layer 2 (contextual):** `FP-FUNCTION-COMPOSITION`, `FP-HIGHER-ORDER-FUNCTIONS`, `FP-ALGEBRAIC-DATA-TYPES`, `FP-CURRYING`, `FP-PATTERN-MATCHING`, `FP-FUNCTIONAL-CORE-IMPERATIVE-SHELL`, `FP-LAZY-EVALUATION`, `FP-EQUATIONAL-REASONING`, `FP-OPTION-EITHER-TYPES`, `FP-RECURSION`, `FP-TAIL-CALL-OPTIMISATION`, `FP-FUNCTOR-MONAD`, `FP-PERSISTENT-DATA-STRUCTURES`, `FP-POINT-FREE-STYLE`, `FP-TOTALITY`, `FP-MONOIDS-SEMIGROUPS`

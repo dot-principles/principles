@@ -20,12 +20,6 @@ New namespace: `db`
 - [ ] Separate read and write models where load demands it — CQRS: optimise query models independently of command models when they have diverging requirements
 - [ ] Outbox pattern — write events to a database outbox table in the same transaction as the domain change; relay them asynchronously to avoid dual-write inconsistency
 
-## 🏗️ OOP / object design principles
-Extend existing namespaces or new namespace: `oop`
-
-- [ ] Law of Demeter — a method should only call methods on its direct collaborators; never chain through intermediaries
-- [ ] Tell Don't Ask — tell objects what to do rather than asking for their state and deciding outside them
-
 ## 🏛️ Architecture patterns
 Extend `arch` or new namespace: `arch-patterns`
 

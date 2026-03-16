@@ -1,5 +1,5 @@
 name: gof
-description: "All 25 Gang of Four entries — 2 foundational principles + 23 design patterns"
+description: "All 27 Gang of Four entries — 2 foundational principles + 23 design patterns + 2 supplementary principles"
 
 principles:
   - GOF-PROGRAM-TO-INTERFACE
@@ -27,3 +27,5 @@ principles:
   - GOF-STRATEGY
   - GOF-TEMPLATE-METHOD
   - GOF-VISITOR
+  - GOF-LAW-OF-DEMETER
+  - GOF-NULL-OBJECT
