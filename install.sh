@@ -140,6 +140,7 @@ write_copilot_prompt() {
     cat > "$prompt_file" <<EOF
 ---
 description: $(copilot_prompt_description "$command_name")
+mode: agent
 ---
 
 EOF
