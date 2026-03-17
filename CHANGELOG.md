@@ -10,6 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- **`principles/AUDIT-SCOPE.md`** — central document explaining which principles are fully excluded or partially limited for `/audit`, with rationale for each
+- **`**Audit-scope:**` metadata field** — 8 principle files annotated:
+  - Fully excluded (snapshot cannot detect violations): `CODE-CS-BOY-SCOUT`, `ARCH-CONWAYS-LAW`, `CODE-PF-PROFILE-FIRST`, `SEC-ARCH-THREAT-MODELLING`
+  - Partially limited (some violations detectable from code): `CODE-TS-TEST-FIRST`, `12FACTOR-10-DEV-PROD-PARITY`, `12FACTOR-09-DISPOSABILITY`, `DDD-UBIQUITOUS-LANGUAGE`
+- **`CONTRIBUTING.md`** — two new requirements: code auditability (every principle needs at least one code-detectable violation) and no redundancy (no duplicate principles, check `catalog.yaml` first)
+- **`principles/TEMPLATE.md`** — optional `**Audit-scope:**` field added as a commented line with usage guidance
+
 ---
 
 ## [v0.2.0] — 2026-03-17

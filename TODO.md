@@ -1,6 +1,6 @@
 # 📋 TODO — Principle gaps to fill
 
-## 🧪 Testing principles
+## 2🧪 Testing principles
 Extend `code/ts`
 
 - [ ] Test pyramid — maintain a deliberately unequal ratio of unit, integration, and end-to-end tests; more fast unit tests, fewer slow E2E tests

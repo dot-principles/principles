@@ -3,6 +3,7 @@
 **Layer:** 2 (contextual)
 **Categories:** domain-modeling, domain-driven-design
 **Applies-to:** all
+**Audit-scope:** limited — can detect generic technical names and intra-codebase naming inconsistencies; cannot verify whether naming matches domain-expert vocabulary (requires a domain glossary)
 
 ## Principle
 

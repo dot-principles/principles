@@ -3,6 +3,7 @@
 **Layer:** [1 (universal) | 2 (contextual) | 3 (risk-elevated)]
 **Categories:** [comma-separated: security, reliability, api-design, concurrency, etc.]
 **Applies-to:** [all | java, kotlin, c#, etc.]
+<!-- **Audit-scope:** excluded — [reason]  ← omit this line if fully auditable; use "limited — [what is/isn't detectable]" for partial coverage -->
 
 ## Principle
 

@@ -3,6 +3,7 @@
 **Layer:** 2 (contextual)
 **Categories:** testing, quality
 **Applies-to:** all
+**Audit-scope:** limited — can detect absence of corresponding tests; cannot determine whether tests were written before production code (requires git history)
 
 ## Principle
 

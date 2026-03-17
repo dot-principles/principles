@@ -3,6 +3,7 @@
 **Layer:** 2 (contextual)
 **Categories:** architecture, org-design, systems-thinking
 **Applies-to:** system-design, team-structure
+**Audit-scope:** excluded — violations require knowing team and org structure, which is external to the codebase
 
 ## Principle
 

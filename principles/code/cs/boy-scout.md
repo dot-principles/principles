@@ -3,6 +3,7 @@
 **Layer:** 1 (universal)
 **Categories:** maintainability, refactoring, craftsmanship
 **Applies-to:** all
+**Audit-scope:** excluded — violations require comparing code to a prior state (git history); a codebase snapshot cannot be audited
 
 ## Principle
 
