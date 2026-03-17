@@ -1,12 +1,5 @@
 # 📋 TODO — Principle gaps to fill
 
-## 🏛️ Architecture patterns
-Extend `arch` or new namespace: `arch-patterns`
-
-- [ ] Hexagonal Architecture (Ports & Adapters) — isolate domain logic behind ports; adapters implement ports for specific technologies. Distinct from Clean Architecture's dependency rule in its explicit port/adapter vocabulary
-- [ ] Saga pattern — coordinate distributed transactions across services using a sequence of local transactions with compensating actions on failure
-- [ ] Strangler Fig — incrementally replace a legacy system by routing traffic to a new implementation piece by piece, running both in parallel until the old system can be retired
-
 ## 🚢 Continuous delivery practices
 New namespace: `cd`
 
