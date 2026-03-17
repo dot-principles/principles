@@ -1,15 +1,5 @@
 # 📋 TODO — Principle gaps to fill
 
-## 🚢 Continuous delivery practices
-New namespace: `cd`
-
-- [ ] Trunk-based development — commit to the main branch frequently; avoid long-lived feature branches
-- [ ] Keep the build green — a failing build is the team's highest priority; nothing else ships until it passes
-- [ ] Deploy on every commit — the pipeline should be capable of releasing any green commit to production
-- [ ] Feature flags for continuous delivery — decouple deployment from release; hide incomplete work behind flags rather than branches
-- [ ] Fast feedback loops — optimise the pipeline so engineers know within minutes whether a change is safe
-- [ ] GitOps — infrastructure and application state is declared in git; an operator continuously reconciles actual state to match
-
 ## 🌐 API design
 Extend `code/api`
 

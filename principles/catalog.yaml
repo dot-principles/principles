@@ -1,5 +1,5 @@
 # .principles — Consolidated Catalog
-# Generated from principle files. 242 principles across 16 namespaces.
+# Generated from principle files. 253 principles across 17 namespaces.
 # Each entry maps a current principle ID to lightweight metadata.
 # Full principle text lives in the principle markdown files under principles/.
 
@@ -1517,4 +1517,74 @@ DB-DENORMALIZE-INTENTIONALLY:
   title: "Denormalise intentionally — introduce redundancy only with a measured justification and explicit consistency enforcement"
   layer: 2
   categories: [database, performance, data-modeling, maintainability]
+  applies_to: [all]
+
+# =============================================================================
+# CD
+# =============================================================================
+
+CD-TRUNK-BASED-DEVELOPMENT:
+  title: "Trunk-based development — commit to the main branch frequently; avoid long-lived feature branches"
+  layer: 1
+  categories: [devops, continuous-delivery, version-control, collaboration]
+  applies_to: [all]
+
+CD-KEEP-BUILD-GREEN:
+  title: "Keep the build green — a failing build is the team's highest priority; nothing else ships until it passes"
+  layer: 1
+  categories: [devops, continuous-delivery, testing, quality]
+  applies_to: [all]
+
+CD-DEPLOY-ON-EVERY-COMMIT:
+  title: "Deploy on every commit — the pipeline should be capable of releasing any green commit to production"
+  layer: 2
+  categories: [devops, continuous-delivery, automation, deployment]
+  applies_to: [all]
+
+CD-FEATURE-FLAGS:
+  title: "Feature flags for continuous delivery — decouple deployment from release; hide incomplete work behind flags, not branches"
+  layer: 2
+  categories: [devops, continuous-delivery, deployment, release-management]
+  applies_to: [all]
+
+CD-FAST-FEEDBACK-LOOPS:
+  title: "Fast feedback loops — optimise the pipeline so engineers know within minutes whether a change is safe"
+  layer: 1
+  categories: [devops, continuous-delivery, testing, pipeline]
+  applies_to: [all]
+
+CD-GITOPS:
+  title: "GitOps — infrastructure and application state is declared in git; an operator continuously reconciles actual state to match"
+  layer: 2
+  categories: [devops, infrastructure, continuous-delivery, version-control]
+  applies_to: [all]
+
+CD-BLUE-GREEN-DEPLOYMENT:
+  title: "Blue-green deployment — maintain two identical environments; switch traffic between them to release with zero downtime"
+  layer: 2
+  categories: [devops, continuous-delivery, deployment, reliability]
+  applies_to: [all]
+
+CD-CANARY-RELEASE:
+  title: "Canary release — route a controlled slice of traffic to the new version before rolling it out fully"
+  layer: 2
+  categories: [devops, continuous-delivery, deployment, reliability, risk-management]
+  applies_to: [all]
+
+CD-DEPLOYMENT-SMOKE-TESTS:
+  title: "Deployment smoke tests — run a minimal automated test suite after every deployment to verify the service is alive"
+  layer: 2
+  categories: [devops, continuous-delivery, testing, deployment, reliability]
+  applies_to: [all]
+
+CD-PIPELINE-AS-CODE:
+  title: "Pipeline as code — CI/CD pipeline definitions are committed to version control alongside application code"
+  layer: 1
+  categories: [devops, continuous-delivery, automation, version-control]
+  applies_to: [all]
+
+CD-BUILD-ONCE-DEPLOY-MANY:
+  title: "Build once, deploy many — compile and package the artifact exactly once; promote that same immutable artifact through every environment"
+  layer: 1
+  categories: [devops, continuous-delivery, deployment, reliability]
   applies_to: [all]
