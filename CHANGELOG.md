@@ -12,34 +12,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-- **7 new observability principles** — extending `code/ob` namespace:
-  - **`CODE-OB-USE-METHOD`** — for every infrastructure resource, measure Utilisation, Saturation, and Errors; a systematic checklist that predicts most resource-related failures (Gregg, *Systems Performance* 2nd ed., ISBN 978-0-13-682045-9)
-  - **`CODE-OB-RED-METHOD`** — for every service, instrument Rate, Errors, and Duration as the minimum contract for user-visible health (Wilkie, GrafanaCon 2018; Sridharan, *Distributed Systems Observability*, ISBN 978-1-492-03364-9)
-  - **`CODE-OB-ERROR-BUDGET`** — alert on SLO burn rate using a multi-window strategy; treat budget exhaustion as the trigger to halt feature work (Google SRE Book ch. 3; SRE Workbook ch. 5). Includes `## Inspection` grep pattern for alert rule files.
-  - **`CODE-OB-FOUR-GOLDEN-SIGNALS`** — every service must expose Latency, Traffic, Errors, and Saturation; the four dimensions cover the most common causes of user-visible degradation (Google SRE Book ch. 6)
-  - **`CODE-OB-HEALTH-CHECK-API`** — every service exposes distinct liveness and readiness endpoints returning machine-readable status; orchestrators use them to route traffic and restart unhealthy instances (Richardson, *Microservices Patterns*, ISBN 978-1-617-29454-9). Includes `## Inspection` grep pattern.
-  - **`CODE-OB-PERCENTILE-LATENCY`** — record latency as a histogram and report p99/p99.9 tail percentiles; averages conceal the experience of the worst-affected users and the compounding tail effect in fan-out architectures (Dean & Barroso, "The Tail at Scale", CACM 2013, DOI 10.1145/2408776.2408794)
-  - **`CODE-OB-ALERT-ON-SYMPTOMS`** — alert rules should fire on user-visible symptoms (SLO violations, error rates, latency) not internal causes (CPU, queue depth); `**Audit-scope:** limited` (Google SRE Book ch. 6; SRE Workbook ch. 5)
-  - `groups/microservices.yaml` updated with all 7 new principle IDs
-  - `principles/code/.context-prime.md` and `.context-audit.md` updated with new ob entries
-  - `principles/catalog.yaml` updated: 242 principles across 16 namespaces
-
-- **4 new testing principles** — extending `code/ts` namespace:
-  - **`CODE-TS-TEST-DATA-BUILDER`** — build test fixtures using the Builder pattern so tests express intent rather than wiring; changes to object construction stay in one place (Pryce & Freeman, *GOOS*, ISBN 978-0-321-50362-6)
-  - **`CODE-TS-HUMBLE-OBJECT`** — extract hard-to-test logic from framework/UI shells into plain, dependency-free classes that can be unit-tested without the framework (Meszaros, *xUnit Test Patterns*, ISBN 978-0-13-149505-0)
-  - **`CODE-TS-NO-TEST-LOGIC-IN-PRODUCTION`** — never add test-specific branches, env guards, or test framework imports to production code; use dependency injection and seams instead (Meszaros, *xUnit Test Patterns*; Feathers, *WELC*, ISBN 978-0-13-117705-5). Includes `## Inspection` section and grep patterns in `code/.context-inspect.md`
-  - **`CODE-TS-CHARACTERIZATION-TESTS`** — before refactoring legacy code, pin its current behaviour with tests so regressions are caught at the desk, not in production; `**Audit-scope:** limited` (Feathers, *WELC*, ISBN 978-0-13-117705-5)
-  - **`CODE-TS-TEST-PYRAMID`** — structure test suites as a pyramid: many unit tests, fewer integration tests, minimal E2E; push tests to the lowest tier that gives confidence (Cohn 2009; Fowler 2012; Humble & Farley 2010)
-  - **`CODE-TS-CONSUMER-DRIVEN-CONTRACTS`** — consumers record the exact interactions they depend on; providers verify all consumer contracts in CI before merging, catching breaking changes without shared environments (Fowler 2006; Pact Foundation; Richardson 2018)
-  - **`CODE-TS-PROPERTY-BASED-TESTING`** — specify invariants and let a framework (QuickCheck, Hypothesis, fast-check) generate hundreds of inputs to surface edge cases that hand-written examples miss (Claessen & Hughes 2000)
-  - `principles/catalog.yaml` updated: 235 principles across 16 namespaces
-
-- **`principles/AUDIT-SCOPE.md`** — central document explaining which principles are fully excluded or partially limited for `/audit`, with rationale for each
-- **`**Audit-scope:**` metadata field** — 8 principle files annotated:
-  - Fully excluded (snapshot cannot detect violations): `CODE-CS-BOY-SCOUT`, `ARCH-CONWAYS-LAW`, `CODE-PF-PROFILE-FIRST`, `SEC-ARCH-THREAT-MODELLING`
-  - Partially limited (some violations detectable from code): `CODE-TS-TEST-FIRST`, `12FACTOR-10-DEV-PROD-PARITY`, `12FACTOR-09-DISPOSABILITY`, `DDD-UBIQUITOUS-LANGUAGE`
-- **`CONTRIBUTING.md`** — two new requirements: code auditability (every principle needs at least one code-detectable violation) and no redundancy (no duplicate principles, check `catalog.yaml` first)
-- **`principles/TEMPLATE.md`** — optional `**Audit-scope:**` field added as a commented line with usage guidance
+- **7 new observability principles** in `code/ob` — USE Method (Gregg), RED Method (Wilkie), Error Budget burn-rate alerting, Four Golden Signals, Health Check API (Richardson), Percentile-based latency (Dean & Barroso), Alert on symptoms not causes. `CODE-OB-ERROR-BUDGET` and `CODE-OB-HEALTH-CHECK-API` include `## Inspection` grep patterns. `CODE-OB-ALERT-ON-SYMPTOMS` is `Audit-scope: limited`. `groups/microservices.yaml`, context files, and `catalog.yaml` (242 principles) updated.
+- **7 new testing principles** in `code/ts` — Test Data Builder, Humble Object, No Test Logic in Production (with inspection), Characterization Tests (`Audit-scope: limited`), Test Pyramid, Consumer-Driven Contracts, Property-Based Testing.
+- **Audit-scope metadata** — `principles/AUDIT-SCOPE.md` added; 8 principle files annotated (4 excluded, 4 limited).
+- **`CONTRIBUTING.md`** — code auditability and no-redundancy requirements added.
+- **`principles/TEMPLATE.md`** — optional `**Audit-scope:**` field documented.
 
 ---
 
@@ -47,45 +24,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Changed
 
-- **Installer now copies principle data to `~/.principles`** — `install.sh` creates a fixed well-known data directory (`~/.principles` on Linux/macOS/Windows Git Bash; `%USERPROFILE%\.principles` on Windows) and copies `groups/` and `principles/` into it on every install. The directory is refreshed (old files removed, new files copied) on every run, so updates are always in sync.
-- **`{{PRINCIPLES_DIRECTORY}}` placeholder resolved at installation time** — The Claude Code command files (`audit.md`, `prime.md`, `scout.md`) contain `{{PRINCIPLES_DIRECTORY}}` as a placeholder for the data directory. `install.sh` now substitutes this with the actual `~/.principles` path via `sed` when writing to `~/.claude/commands/`. The placeholder remains in the source files; only the installed copies are rewritten.
-- **`uninstall.sh` removes `~/.principles` on global uninstall** — Running `./uninstall.sh` (no argument) now deletes `~/.principles` in addition to the command files. Local uninstalls (`./uninstall.sh <dir>`) leave the data directory intact, since it is shared across all installations.
+- **Installer copies principle data to `~/.principles`** — created on install, refreshed on every run; `{{PRINCIPLES_DIRECTORY}}` placeholder substituted at install time in command files. Global uninstall removes `~/.principles`; local uninstalls leave it intact.
 
 ### Added
 
-- **14 new database / persistence principles** — new namespace `db`:
-  - **Layer 1 (universal):** `DB-ACID` (Gray & Reuter 1992 / Haerder & Reuter 1983), `DB-SCHEMA-MIGRATIONS-AS-CODE` (Humble & Farley 2010)
-  - **Layer 2 (contextual):** `DB-CAP-THEOREM` (Brewer 2000 / Gilbert & Lynch 2002), `DB-AVOID-N-PLUS-ONE` (Kleppmann 2017 / Fowler PEAA), `DB-INDEX-FOR-ACCESS-PATTERNS` (Kleppmann 2017 / Winand 2012), `DB-THIRD-NORMAL-FORM` (Codd 1970 / Date 2003), `DB-CQRS` (Young 2010 / Fowler 2011), `DB-OUTBOX-PATTERN` (Richardson 2018), `DB-EVENTUAL-CONSISTENCY` (Vogels 2008 / Pritchett 2008), `DB-EVENT-SOURCING` (Young 2010 / Fowler 2005), `DB-OPTIMISTIC-CONCURRENCY` (Kung & Robinson 1981), `DB-TWO-PHASE-LOCKING` (Gray 1978), `DB-POLYGLOT-PERSISTENCE` (Fowler & Sadalage 2012), `DB-DENORMALIZE-INTENTIONALLY` (Fowler PEAA / Date 2003)
-  - `DB-AVOID-N-PLUS-ONE` includes an `## Inspection` section with a grep heuristic for queries inside loops
-  - `groups/db.yaml` added — bundles all 14 principles for the `@db` group
-  - `principles/db/.context-prime.md` and `.context-audit.md` added for `/prime` and `/audit` support
-  - `principles/catalog.yaml` updated: 228 principles across 16 namespaces
-
-- **7 new security principles** across two namespaces:
-  - **`code/sec/`** (4 new) — `CODE-SEC-DEFENSE-IN-DEPTH` (NIST SP 800-53 / NSA), `CODE-SEC-FAIL-SAFE-DEFAULTS` (Saltzer & Schroeder 1975), `CODE-SEC-COMPLETE-MEDIATION` (Saltzer & Schroeder 1975), `CODE-SEC-PRIVACY-BY-DESIGN` (Cavoukian / ISO/IEC 29101 / GDPR Art 25)
-  - **`sec-arch/`** (new namespace, 3 principles) — `SEC-ARCH-THREAT-MODELLING` (Shostack / OWASP), `SEC-ARCH-ZERO-TRUST` (NIST SP 800-207 / Kindervag), `SEC-ARCH-SUPPLY-CHAIN-SECURITY` (SLSA / NIST SP 800-218)
-  - `CODE-SEC-FAIL-SAFE-DEFAULTS` includes an `## Inspection` section and a new grep pattern in `code/.context-inspect.md`
-  - `SEC-ARCH-SUPPLY-CHAIN-SECURITY` includes inspection patterns for floating CI action refs and undigested Docker base images
-  - `groups/security-focused.yaml` updated with all 7 new principle IDs
-  - `principles/catalog.yaml` updated: 214 principles across 15 namespaces
-
-- **27 new OOP/object-design principles** across 6 namespaces:
-  - **`pkg/` namespace** (new) — Robert Martin's 6 Package/Component Principles: `PKG-REP`, `PKG-CCP`, `PKG-CRP`, `PKG-ADP`, `PKG-SDP`, `PKG-SAP`; new `@pkg` group
-  - **`gof/`** — `GOF-LAW-OF-DEMETER` (Law of Demeter, IEEE 1989), `GOF-NULL-OBJECT` (Woolf / Fowler)
-  - **`code/cs/`** — `CODE-CS-DESIGN-BY-CONTRACT` (Meyer), `CODE-CS-TELL-DONT-ASK` (Hunt & Thomas), `CODE-CS-INFORMATION-HIDING` (Parnas 1972), `CODE-CS-UNIFORM-ACCESS` (Meyer)
-  - **`code-smells/`** — 9 missing Fowler smells: `CODE-SMELLS-LONG-PARAMETER-LIST`, `CODE-SMELLS-DIVERGENT-CHANGE`, `CODE-SMELLS-SHOTGUN-SURGERY`, `CODE-SMELLS-REFUSED-BEQUEST`, `CODE-SMELLS-INSIDER-TRADING`, `CODE-SMELLS-DATA-CLASS`, `CODE-SMELLS-TEMPORARY-FIELD`, `CODE-SMELLS-ALTERNATIVE-CLASSES`, `CODE-SMELLS-GLOBAL-DATA`
-  - **`effective-java/`** — 5 new items: `EFFECTIVE-JAVA-PREFER-DEPENDENCY-INJECTION` (Item 5), `EFFECTIVE-JAVA-OVERRIDE-EQUALS-CONTRACT` (Items 10/11), `EFFECTIVE-JAVA-DESIGN-FOR-INHERITANCE` (Item 19), `EFFECTIVE-JAVA-PREFER-INTERFACES` (Item 20), `EFFECTIVE-JAVA-DESIGN-INTERFACES-FOR-POSTERITY` (Item 21)
-  - **`ddd/`** — `DDD-SPECIFICATION` (Evans / Fowler)
-- All affected `.context-audit.md` and `.context-prime.md` files updated
-- All affected `groups/` YAML files updated
-
-- **`fp` namespace** — 20 functional programming principles covering the full FP spectrum:
-  - **Layer 1 (universal):** `FP-PURE-FUNCTIONS`, `FP-REFERENTIAL-TRANSPARENCY`, `FP-IMMUTABILITY`, `FP-AVOID-SHARED-MUTABLE-STATE`
-  - **Layer 2 (contextual):** `FP-FUNCTION-COMPOSITION`, `FP-HIGHER-ORDER-FUNCTIONS`, `FP-ALGEBRAIC-DATA-TYPES`, `FP-CURRYING`, `FP-PATTERN-MATCHING`, `FP-FUNCTIONAL-CORE-IMPERATIVE-SHELL`, `FP-LAZY-EVALUATION`, `FP-EQUATIONAL-REASONING`, `FP-OPTION-EITHER-TYPES`, `FP-RECURSION`, `FP-TAIL-CALL-OPTIMISATION`, `FP-FUNCTOR-MONAD`, `FP-PERSISTENT-DATA-STRUCTURES`, `FP-POINT-FREE-STYLE`, `FP-TOTALITY`, `FP-MONOIDS-SEMIGROUPS`
-- **`@fp` group** — `groups/fp.yaml` bundles all 20 FP principles for functional-first projects
-- **11 new language groups** — `@javascript`, `@swift`, `@ruby`, `@php`, `@scala`, `@cpp`, `@c`, `@dart`, `@elixir`, `@haskell`, `@fsharp`; FP principles included where the language has native/idiomatic support
-- **Pre-compiled context files** — `principles/fp/.context-prime.md`, `.context-audit.md`, `.context-inspect.md` for fast `/prime` and `/audit` loading
-- **Catalog updated** — `principles/catalog.yaml` now covers 207 principles across 14 namespaces
+- **14 new database principles** in new `db` namespace — `DB-ACID`, `DB-SCHEMA-MIGRATIONS-AS-CODE`, `DB-CAP-THEOREM`, `DB-AVOID-N-PLUS-ONE` (with inspection), `DB-INDEX-FOR-ACCESS-PATTERNS`, `DB-THIRD-NORMAL-FORM`, `DB-CQRS`, `DB-OUTBOX-PATTERN`, `DB-EVENTUAL-CONSISTENCY`, `DB-EVENT-SOURCING`, `DB-OPTIMISTIC-CONCURRENCY`, `DB-TWO-PHASE-LOCKING`, `DB-POLYGLOT-PERSISTENCE`, `DB-DENORMALIZE-INTENTIONALLY`. New `@db` group and context files.
+- **7 new security principles** — 4 in `code/sec` (`DEFENSE-IN-DEPTH`, `FAIL-SAFE-DEFAULTS` with inspection, `COMPLETE-MEDIATION`, `PRIVACY-BY-DESIGN`) and 3 in new `sec-arch` namespace (`THREAT-MODELLING`, `ZERO-TRUST`, `SUPPLY-CHAIN-SECURITY` with inspection). `groups/security-focused.yaml` updated.
+- **27 new OOP/object-design principles** — `pkg` namespace (6 Package Principles, Martin); `gof` additions (Law of Demeter, Null Object); `code/cs` additions (Design by Contract, Tell Don't Ask, Information Hiding, Uniform Access); 9 Fowler code smells; 5 Effective Java items; `DDD-SPECIFICATION`.
+- **20 functional programming principles** in new `fp` namespace — 4 universal (pure functions, referential transparency, immutability, no shared mutable state), 16 contextual. New `@fp` group and 11 new language groups (`@javascript`, `@swift`, `@ruby`, `@php`, `@scala`, `@cpp`, `@c`, `@dart`, `@elixir`, `@haskell`, `@fsharp`).
 
 ---
 
