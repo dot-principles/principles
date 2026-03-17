@@ -30,6 +30,28 @@ normalize_path() {
     printf '%s' "$p"
 }
 
+normalize_directory_path() {
+    local dir
+    dir="$(normalize_path "$1")"
+    if [ -z "$dir" ]; then
+        printf '%s' "$dir"
+        return
+    fi
+
+    case "$dir" in
+        /|[A-Za-z]:/)
+            printf '%s' "$dir"
+            return
+            ;;
+    esac
+
+    while [ "${dir%/}" != "$dir" ]; do
+        dir="${dir%/}"
+    done
+
+    printf '%s' "$dir"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Resolve the home directory for global asset removal.
@@ -58,7 +80,7 @@ UNINSTALL_SCOPE="global"
 PROJECT_DIR=""
 if [ -n "${1:-}" ] && [[ "${1:-}" != --* ]]; then
     UNINSTALL_SCOPE="local"
-    PROJECT_DIR="$(normalize_path "$1")"
+    PROJECT_DIR="$(normalize_directory_path "$1")"
 fi
 
 # Colors (if terminal supports them)

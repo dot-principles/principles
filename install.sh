@@ -34,6 +34,28 @@ normalize_path() {
     printf '%s' "$p"
 }
 
+normalize_directory_path() {
+    local dir
+    dir="$(normalize_path "$1")"
+    if [ -z "$dir" ]; then
+        printf '%s' "$dir"
+        return
+    fi
+
+    case "$dir" in
+        /|[A-Za-z]:/)
+            printf '%s' "$dir"
+            return
+            ;;
+    esac
+
+    while [ "${dir%/}" != "$dir" ]; do
+        dir="${dir%/}"
+    done
+
+    printf '%s' "$dir"
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Resolve the home directory for global asset installation.
@@ -454,7 +476,7 @@ show_usage() {
 # Main
 print_header
 
-DIR_ARG="$(normalize_path "${2:-}")"
+DIR_ARG="$(normalize_directory_path "${2:-}")"
 
 case "${1:-}" in
     claude)
