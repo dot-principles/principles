@@ -403,7 +403,7 @@ install_cursor() {
     local target_dir="$project_dir/.cursor/rules"
     mkdir -p "$target_dir"
 
-    local target_file="$target_dir/.principles.mdc"
+    local target_file="$target_dir/principles.mdc"
 
     cat > "$target_file" << 'CURSOR_FRONTMATTER'
 ---
