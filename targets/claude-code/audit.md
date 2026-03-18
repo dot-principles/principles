@@ -1,15 +1,25 @@
 # Audit
 
-Review code against activated coding principles in seven phases.
+Review a file, directory, or inline code against its activated principles in seven phases.
 
-## Phase 1 — Resolve Input
+## Phase 1 — Resolve Input and Detect Artifact Type
+
+### 1.1 — Resolve Input
 
 Determine what to review from `$ARGUMENTS`:
 
-- Empty → respond "What code would you like me to review?" and stop.
+- Empty → respond "What would you like me to review?" and stop.
 - File path → read that file.
-- Directory path → recursively glob all source files; exclude binaries, lock files, `node_modules`, `vendor`, `dist`, `build`, `.git`, and build artifacts.
-- Inline code → use it directly.
+- Directory path → recursively glob all reviewable files; exclude binaries, lock files, `node_modules`, `vendor`, `dist`, `build`, `.git`, and build artifacts.
+- Inline code or text → use it directly.
+
+### 1.2 — Detect Artifact Type
+
+For the target file(s), detect the artifact type by reading `{{PRINCIPLES_DIRECTORY}}/layers/artifact-types.yaml` and matching against its type definitions. Match by file extension, filename, or path pattern in precedence order (infra before config for ambiguous YAML).
+
+Record the detected type: **`code`** | **`docs`** | **`config`** | **`infra`** | **`schema`** | **`pipeline`**
+
+If the target is a directory with mixed artifact types, note the mix; apply per-file type detection in Phase 6.
 
 ## Phase 2 — Resolve .principles Hierarchy
 
@@ -22,40 +32,29 @@ Walk up from the target path to the git repo root (`.git/`) or max 10 levels, co
 Lines starting with `:` are configuration directives. Parse them before processing IDs:
 
 - `:max_principles N` — cap the total number of active principles to N. When trimming to fit:
-  1. Layer 1 principles are **always retained** (never trimmed)
-  2. Layer 3 risk-elevated principles — next priority
-  3. Layer 2 context-dependent principles — lowest priority, dropped first
-  If Layer 1 alone exceeds the cap, the cap applies only to non-Layer-1 principles (Layer 1 is never dropped).
+  1. Universal principles (from `artifact-types.yaml`) are **always retained**
+  2. Stack layer 1 principles are **always retained**
+  3. Layer 3 risk-elevated principles — next priority
+  4. Layer 2 context-dependent principles — lowest priority, dropped first
 
-### Layer 1 — Always Seeded
+### Seed — Universal + Stack Layer 1
+
+**Step 1 — Universal principles** (active for ALL artifact types):
+
+Read `{{PRINCIPLES_DIRECTORY}}/layers/artifact-types.yaml` → `universal` section. Add all listed IDs to the active set:
 
 | ID | Title |
 |----|-------|
-| SOLID-SRP | Single Responsibility Principle |
-| GOF-COMPOSITION-OVER-INHERITANCE | Favor Composition over Inheritance |
-| GOF-PROGRAM-TO-INTERFACE | Program to an Interface, Not an Implementation |
-| SIMPLE-DESIGN-PASSES-TESTS | Passes all tests |
 | SIMPLE-DESIGN-REVEALS-INTENTION | Reveals intention |
-| SIMPLE-DESIGN-NO-DUPLICATION | No duplication |
-| SIMPLE-DESIGN-FEWEST-ELEMENTS | Fewest elements |
-| CODE-SEC-VALIDATE-INPUT | Validate input at system boundaries |
 | CODE-CS-DRY | DRY: Don't Repeat Yourself |
-| CODE-CS-WET | WET: Write Every Time |
-| CODE-CS-YAGNI | YAGNI: You Aren't Gonna Need It |
 | CODE-CS-KISS | KISS: Keep It Simple |
-| CODE-CS-NIH | NIH: Not Invented Here |
-| CODE-CS-NO-SILVER-BULLET | No Silver Bullet |
-| CODE-CS-CQS | CQS: Command-Query Separation |
-| CODE-CS-BOY-SCOUT | The Boy Scout Rule |
-| CODE-CS-BROKEN-WINDOWS | Broken Windows |
-| CODE-CS-POSTELS-LAW | Postel's Law |
-| CODE-CS-HYRUMS-LAW | Hyrum's Law |
-| ARCH-CONWAYS-LAW | Conway's Law |
 | CODE-DX-NAMING | Name things by what they represent |
-| CODE-DX-SMALL-FUNCTIONS | Keep functions small and single-purpose |
-| CODE-DX-CODE-FOR-READERS | Write code for the reader, not the writer |
-| CODE-DX-DELETE-DEAD-CODE | Delete dead code |
-| CODE-CS-FAIL-FAST | Fail fast, fail loudly |
+| ARCH-DECISION-RECORDS | Architecture Decision Records |
+| CODE-CS-YAGNI | YAGNI: You Aren't Gonna Need It |
+
+**Step 2 — Stack layer 1** (active for the detected artifact type):
+
+Read `{{PRINCIPLES_DIRECTORY}}/layers/<detected-type>/layer-1-universal.md`. Add all principle IDs from the table in that file to the active set.
 
 ### Process Each .principles File (root → target)
 
@@ -71,84 +70,21 @@ Lines starting with `:` are configuration directives. Parse them before processi
 
 **Only if Phase 2 found no `.principles` files.**
 
-Detect language, framework, domain, and risk signals (auth, payments, PII, public APIs, concurrency, high-throughput). Seed with Layer 1, then apply:
+### Layer 1 — Seed
+
+Same as Phase 2 seeding: universal principles + stack layer 1 from `{{PRINCIPLES_DIRECTORY}}/layers/<detected-type>/layer-1-universal.md`.
 
 ### Layer 2 — Context-Dependent
 
-Activate ALL matching contexts:
+Read `{{PRINCIPLES_DIRECTORY}}/layers/<detected-type>/layer-2-contexts.yaml`.
 
-**api-design** — REST/HTTP endpoints, controllers
-Signals: `@RestController`, `@GetMapping`, `app.get(`, `router.`, `HttpResponse`, `FastAPI`, `flask`, `express`, `swagger`
-Activate: CODE-API-STANDARD-HTTP-METHODS, CODE-API-HATEOAS, CODE-API-RESOURCE-NOUNS, CODE-API-BACKWARD-COMPATIBILITY, CODE-API-HTTP-STATUS-CODES, CODE-SEC-VALIDATE-INPUT, OWASP-03-INJECTION
-
-**concurrency** — Threads, async, locks
-Signals: `async`, `await`, `Thread`, `Lock`, `Mutex`, `Semaphore`, `synchronized`, `asyncio`, `goroutine`, `channel`
-Activate: CODE-CC-SYNC-SHARED-STATE through CODE-CC-STRUCTURED-CONCURRENCY
-
-**domain-modeling** — DDD entities, value objects, aggregates
-Signals: `Entity`, `ValueObject`, `Aggregate`, `Repository`, `DomainEvent`, `BoundedContext`
-Activate: DDD-AGGREGATE-ROOT, DDD-AGGREGATE, DDD-ENTITY, DDD-VALUE-OBJECT, DDD-REPOSITORY, DDD-DOMAIN-EVENT, DDD-BOUNDED-CONTEXT, DDD-UBIQUITOUS-LANGUAGE
-
-**data-pipeline** — Streaming, ETL, batch, message queues
-Signals: `stream`, `pipeline`, `ETL`, `kafka`, `rabbitmq`, `producer`, `consumer`, `airflow`, `dag`
-Activate: CODE-AR-ASYNC-MESSAGING, CODE-AR-PIPES-AND-FILTERS, CODE-AR-MESSAGE-BROKER, CODE-RL-IDEMPOTENCY, CODE-RL-BACKPRESSURE, CODE-RL-SCHEMA-EVOLUTION
-
-**testing** — Test files and frameworks
-Signals: `test_`, `_test.go`, `.test.ts`, `.spec.ts`, `@Test`, `describe(`, `pytest`, `jest`, `mock`, `fixture`
-Activate: CODE-TS-TEST-FIRST through CODE-TS-TEST-NAMING
-
-**object-oriented** — Classes, interfaces, inheritance
-Signals: `class`, `extends`, `implements`, `interface`, `abstract`, `override`
-Activate: SOLID-SRP, SOLID-OCP, SOLID-LSP, SOLID-ISP, SOLID-DIP, GOF-COMPOSITION-OVER-INHERITANCE, GOF-PROGRAM-TO-INTERFACE, CODE-CS-DRY, CODE-CS-YAGNI
-
-**cloud-native** — Containers, Kubernetes, twelve-factor
-Signals: `Dockerfile`, `kubernetes`, `helm`, `process.env`, `os.environ`, `ConfigMap`, `health_check`
-Activate: 12FACTOR-01-CODEBASE through 12FACTOR-12-ADMIN-PROCESSES
-
-**infrastructure** — IaC and provisioning
-Signals: `terraform`, `CloudFormation`, `ansible`, `pulumi`, `.tf`, `module`, `variable`
-Activate: CODE-AR-INFRASTRUCTURE-AS-CODE through CODE-AR-COMPOSABLE-MODULES
-
-**ui-interaction** — UI components, forms, navigation
-Signals: `useState`, `useEffect`, `onClick`, `onChange`, `form`, `template`, `v-model`, JSX, TSX
-Activate: CODE-DX-SYSTEM-STATUS-VISIBILITY through CODE-DX-DATA-INK-RATIO
-
-**library-api** — Public libraries, SDKs
-Signals: `export`, `__init__.py`, `setup.py`, `package.json`, `Cargo.toml`, `npm publish`
-Activate: CODE-API-STANDARD-HTTP-METHODS, CODE-API-HATEOAS, CODE-API-RESOURCE-NOUNS, CODE-API-HTTP-STATUS-CODES, CODE-API-BACKWARD-COMPATIBILITY
-
-**functional** — Immutability, pure functions
-Signals: `map(`, `filter(`, `reduce(`, `immutable`, `readonly`, `lambda`, `pipe`, `compose`
-Activate: GOF-COMPOSITION-OVER-INHERITANCE, CODE-CC-PREFER-IMMUTABLE, CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE through CODE-TP-BRANDED-TYPES
-
-**typed-language** — Static type systems
-Signals: TypeScript, Kotlin, Rust, Haskell, C#, Scala, `.ts`, `.kt`, `.rs`, `.cs`
-Activate: CODE-TP-MAKE-ILLEGAL-STATES-UNREPRESENTABLE through CODE-TP-BRANDED-TYPES
+Activate ALL matching contexts by scanning the target file(s) content for the signals listed in each context. For each matching context, add its `activate` principle IDs to the active set.
 
 ### Layer 3 — Risk-Elevated
 
-Violations of elevated principles are promoted one severity level (Low→Medium, Medium→High, High→Critical).
+Check for `{{PRINCIPLES_DIRECTORY}}/layers/<detected-type>/layer-3-risk-signals.yaml`. If present, scan the target file(s) for the signals listed in each risk category. For each matching category, add its `elevate` principle IDs to the elevated set — violations of elevated principles are promoted one severity level (Low→Medium, Medium→High, High→Critical).
 
-**authentication** — Signals: `password`, `login`, `OAuth`, `JWT`, `token`, `session`, `bcrypt`, `hash`
-Elevate: OWASP-07-AUTHENTICATION-FAILURES, CODE-SEC-STRONG-CRYPTOGRAPHY, OWASP-01-BROKEN-ACCESS-CONTROL
-
-**financial** — Signals: `payment`, `billing`, `invoice`, `currency`, `transaction`, `stripe`, `paypal`
-Elevate: CODE-SEC-VALIDATE-INPUT, CODE-SEC-DATA-INTEGRITY, CODE-RL-IDEMPOTENCY, CODE-CC-SYNC-SHARED-STATE
-
-**personal-data** — Signals: `PII`, `GDPR`, `email`, `SSN`, `personal_data`, `HIPAA`, `CCPA`
-Elevate: CODE-SEC-VALIDATE-INPUT, CODE-SEC-STRONG-CRYPTOGRAPHY, CODE-SEC-SECURITY-BY-DESIGN, CODE-SEC-SECURITY-LOGGING
-
-**public-api** — Signals: `versioned`, `v1`, `v2`, `third-party`, `backward_compatible`, `deprecat`, `semver`
-Elevate: CODE-API-BACKWARD-COMPATIBILITY, CODE-API-STANDARD-HTTP-METHODS, CODE-API-HTTP-STATUS-CODES, CODE-RL-SCHEMA-EVOLUTION
-
-**high-throughput** — Signals: `hot_path`, `realtime`, `low-latency`, `benchmark`, `throughput`, `cache`, `pool`
-Elevate: CODE-PF-PROFILE-FIRST through CODE-PF-PREDICTABLE-LATENCY, CODE-CC-AVOID-LOCKS-IN-HOT-PATHS
-
-**distributed-system** — Signals: `microservice`, `gRPC`, `circuit_breaker`, `retry`, `idempotent`, `saga`, `outbox`
-Elevate: CODE-RL-FAULT-TOLERANCE through CODE-RL-CONSISTENCY-MODELS, CODE-OB-STRUCTURED-TELEMETRY through CODE-OB-DISTRIBUTED-TRACING, CODE-AR-ASYNC-MESSAGING through CODE-AR-MESSAGE-BROKER
-
-**legacy-codebase** — Signals: `refactor`, `migration`, `legacy`, `tech_debt`, `deprecated`, `strangler`
-Elevate: CODE-CS-DRY, CODE-CS-YAGNI, SIMPLE-DESIGN-PASSES-TESTS, SIMPLE-DESIGN-REVEALS-INTENTION, SIMPLE-DESIGN-NO-DUPLICATION, SIMPLE-DESIGN-FEWEST-ELEMENTS
+Record source as: `dynamic detection (<type> stack)`
 
 ## Phase 4 — Load Principle Content
 
@@ -160,11 +96,13 @@ For each namespace in the active ID set, read one file:
 
 Filter to entries whose `### ID` is in the final active set. Use the **Principle** and **Violations to detect** content in Phase 6.
 
+Namespace derivation: `CODE-CS-DRY` → namespace `code`, `SOLID-SRP` → namespace `solid`, `DOC-PURPOSE` → namespace `docs`, `CONFIG-NO-HARDCODED-SECRETS` → namespace `config`, `SCHEMA-SELF-DESCRIBING` → namespace `schema`, `PIPELINE-MINIMAL-PERMISSIONS` → namespace `pipeline`.
+
 ## Phase 5 — Pre-Scan
 
 **Output nothing during this phase.**
 
-Run deterministic, machine-executable commands to narrow the search space before LLM reasoning. This is the "Search" step of Search-Analyze-Report.
+Run deterministic, machine-executable commands to narrow the search space before LLM reasoning.
 
 ### 5.1 — Load Inspection Patterns
 
@@ -214,9 +152,9 @@ For each file in the pre-scan manifest:
 
 ### Step 2 — Semantic-Only Review
 
-**Read every source file** collected in Phase 1. Apply only the **semantic-only principles** (those without inspection patterns). Do not substitute grep, search, or pattern-matching tools for reading — you must read and understand each file's logic, structure, and intent.
+**Read every file** collected in Phase 1. Apply only the **semantic-only principles** (those without inspection patterns). Do not substitute grep, search, or pattern-matching tools for reading — you must read and understand each file's logic, structure, and intent.
 
-For each file, evaluate design, naming, structure, input handling, duplication, and intent against the semantic-only principle set.
+For each file, evaluate it against the semantic-only principle set appropriate to its artifact type.
 
 ### Step 3 — Opportunistic Findings
 
@@ -235,9 +173,9 @@ For each violation found, record: principle ID, severity (Critical/High/Medium/L
   "findings": [
     {
       "severity":     "HIGH",
-      "principle_id": "SOLID-SRP",
+      "principle_id": "DOC-PURPOSE",
       "title":        "one-line description",
-      "file":         "C:/absolute/path/to/file.py",
+      "file":         "C:/absolute/path/to/file.md",
       "line":         42,
       "description":  "what is wrong",
       "fix":          "concrete fix"
@@ -248,8 +186,9 @@ For each violation found, record: principle ID, severity (Critical/High/Medium/L
     "high": 1,
     "medium": 0,
     "low": 0,
-    "active_principles": ["SOLID-SRP", "CODE-CS-DRY"],
-    "principle_source": ".principles hierarchy (2 files)"
+    "active_principles": ["DOC-PURPOSE", "CODE-CS-DRY"],
+    "principle_source": ".principles hierarchy (2 files)",
+    "artifact_type": "docs"
   }
 }
 ```
@@ -266,28 +205,29 @@ Audit complete — {N} findings.
 
 Critical:
 
-- `{absolute/file.py}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
+- `{absolute/file.ext}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
 
 High:
 
-- `{absolute/file.py}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
+- `{absolute/file.ext}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
 
 Medium:
 
-- `{absolute/file.py}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
+- `{absolute/file.ext}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
 
 Low:
 
-- `{absolute/file.py}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
+- `{absolute/file.ext}:{line}` [{PRINCIPLE-ID}] — {description}. → {fix}.
 
 Summary: {critical} critical, {high} high, {medium} medium, {low} low
+Artifact type: {detected-type}
 Principle source: {source}
 
 Generated: {absolute path}/audit-output.json
 ```
 
 - Group findings by severity (Critical / High / Medium / Low). Omit empty severity groups.
-- Use absolute file paths with forward slashes, wrapped in backticks to prevent markdown mangling (e.g. `__init__.py`).
-- Principle ID in brackets: `[SOLID-SRP]`.
+- Use absolute file paths with forward slashes, wrapped in backticks.
+- Principle ID in brackets: `[DOC-PURPOSE]`.
 - One line per finding.
 - If no findings: output `Audit complete — 0 findings.` followed by the Summary and Generated lines.

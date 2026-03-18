@@ -1,8 +1,13 @@
 name: docs
-description: "Documentation and diagram files — Markdown, AsciiDoc, plain text, Mermaid, D2"
+description: "Documentation files — READMEs, architecture docs, how-to guides, tutorials, and API documentation"
 
 principles:
-  - CODE-DX-NAMING
+  - DOC-PURPOSE
+  - DOC-MINIMAL
+  - DOC-AUDIENCE
+  - DOC-ACCURACY
+  - DOC-EXAMPLES
+  - DOC-PROGRESSIVE-DISCLOSURE
   - CODE-DX-CODE-FOR-READERS
   - CODE-DX-REDUCE-COGNITIVE-LOAD
   - CODE-CS-DRY

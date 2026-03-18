@@ -1,0 +1,65 @@
+# Schema Stack — Layer 2: Context-activated principles
+# Activated when schema file content matches the listed signals.
+# Layer 1 principles are always active; these are additive.
+
+openapi:
+  description: "OpenAPI / Swagger REST API definitions"
+  signals:
+    - "openapi"
+    - "swagger"
+    - "paths:"
+    - "components:"
+    - "schemas:"
+    - "operationId"
+    - "requestBody"
+    - "responses:"
+  activate:
+    - CODE-API-RESOURCE-NOUNS
+    - CODE-API-HTTP-STATUS-CODES
+    - CODE-API-HATEOAS
+
+protobuf:
+  description: "Protocol Buffer service and message definitions"
+  signals:
+    - "syntax = \"proto"
+    - "message "
+    - "rpc "
+    - "service "
+    - "google.protobuf"
+    - "import \"google"
+    - "oneof "
+  activate:
+    - CODE-API-BACKWARD-COMPATIBILITY
+    - EIP-CORRELATION-IDENTIFIER
+
+graphql:
+  description: "GraphQL schema definitions"
+  signals:
+    - "type Query"
+    - "type Mutation"
+    - "type Subscription"
+    - "schema {"
+    - "input "
+    - "enum "
+    - "fragment"
+    - "interface "
+    - "union "
+  activate:
+    - CODE-API-BACKWARD-COMPATIBILITY
+    - CODE-API-RESOURCE-NOUNS
+
+sql-schema:
+  description: "SQL DDL — table definitions, migrations, and schema changes"
+  signals:
+    - "CREATE TABLE"
+    - "ALTER TABLE"
+    - "ADD COLUMN"
+    - "DROP"
+    - "FOREIGN KEY"
+    - "INDEX"
+    - "CONSTRAINT"
+    - "CREATE INDEX"
+    - "RENAME"
+  activate:
+    - CODE-API-BACKWARD-COMPATIBILITY
+    - DB-SCHEMA-MIGRATIONS-AS-CODE

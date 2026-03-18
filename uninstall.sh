@@ -54,6 +54,20 @@ normalize_directory_path() {
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Parse flags before positional arguments
+QUIET=false
+_args=()
+for _arg in "$@"; do
+    case "$_arg" in
+        --quiet|-q) QUIET=true ;;
+        *) _args+=("$_arg") ;;
+    esac
+done
+set -- "${_args[@]+"${_args[@]}"}"
+
+# Output helper — suppressed in --quiet mode (errors always print via stderr)
+qecho() { [ "$QUIET" = false ] && echo -e "$@" || true; }
+
 # Resolve the home directory for global asset removal.
 # When invoked via WSL (e.g. PowerShell 7 finds the WSL bash instead of Git
 # Bash), $HOME is the Linux home (/home/<user>) but assets live in the
@@ -111,9 +125,9 @@ require_project_dir() {
 }
 
 print_header() {
-    echo ""
-    echo -e "${BOLD}code-principles uninstaller${NC}"
-    echo "───────────────────────────"
+    qecho ""
+    qecho "${BOLD}code-principles uninstaller${NC}"
+    qecho "───────────────────────────"
 }
 
 show_usage() {
@@ -133,7 +147,7 @@ show_usage() {
 uninstall_data() {
     if [ -d "$DATA_DIR" ]; then
         rm -rf "$DATA_DIR"
-        echo -e "  ${GREEN}✓${NC} Removed $DATA_DIR"
+        qecho "  ${GREEN}✓${NC} Removed $DATA_DIR"
     fi
 }
 
@@ -150,7 +164,7 @@ uninstall_claude() {
         scope_label="global"
     fi
 
-    echo -e "${BOLD}Removing Claude Code slash commands ($scope_label)...${NC}"
+    qecho "${BOLD}Removing Claude Code slash commands ($scope_label)...${NC}"
 
     local count=0
     local found_target=false
@@ -163,29 +177,29 @@ uninstall_claude() {
             if [ -f "$installed_file" ]; then
                 rm "$installed_file"
                 count=$((count + 1))
-                echo -e "  ${GREEN}✓${NC} /$(basename "$file" .md)"
+                qecho "  ${GREEN}✓${NC} /$(basename "$file" .md)"
             fi
         fi
     done
 
     if [ "$found_target" = false ]; then
-        echo -e "${RED}Error: No Claude Code command templates found in $CLAUDE_TARGETS_DIR.${NC}"
+        echo -e "${RED}Error: No Claude Code command templates found in $CLAUDE_TARGETS_DIR.${NC}" >&2
         exit 1
     fi
 
     if [ $count -eq 0 ]; then
-        echo "  ${NEUTRAL} No current commands found to remove."
+        qecho "  ${NEUTRAL} No current commands found to remove."
     else
-        echo ""
-        echo -e "Removed ${GREEN}$count${NC} commands."
+        qecho ""
+        qecho "Removed ${GREEN}$count${NC} commands."
     fi
 
     if [ -n "$project_dir" ]; then
         cleanup_dir_if_empty "$target_dir"
         cleanup_dir_if_empty "$project_dir/.claude"
     else
-        echo ""
-        echo -e "${BOLD}Removing .principles data...${NC}"
+        qecho ""
+        qecho "${BOLD}Removing .principles data...${NC}"
         uninstall_data
     fi
 }
@@ -205,42 +219,43 @@ uninstall_copilot_local() {
     local prompts_dir="$project_dir/.github/prompts"
     local skills_dir="$project_dir/.github/skills"
 
-    echo -e "${BOLD}Removing GitHub Copilot instructions...${NC}"
+    qecho "${BOLD}Removing GitHub Copilot instructions...${NC}"
 
     if [ ! -f "$target_file" ]; then
-        echo "  ${NEUTRAL} No Copilot instructions found to remove."
-        return
-    fi
-
-    local temp_file
-    temp_file="$(mktemp)"
-
-    awk '
-        BEGIN { in_block=0; removed=0 }
-        /^<!-- code-principles: begin -->$/ { in_block=1; removed=1; next }
-        /^<!-- code-principles: end -->$/   { if (in_block) { in_block=0; next } }
-        !in_block { print }
-        END { exit removed ? 0 : 1 }
-    ' "$target_file" > "$temp_file" || {
-        rm -f "$temp_file"
-        echo "  ${NEUTRAL} No code-principles Copilot instructions found to remove."
-        return
-    }
-
-    # Trim trailing blank lines left after block removal
-    awk '{lines[NR]=$0; if(/[^[:space:]]/) last=NR} END{for(i=1;i<=last;i++) print lines[i]}' \
-        "$temp_file" > "${temp_file}.t" && mv "${temp_file}.t" "$temp_file"
-
-    if grep -q '[^[:space:]]' "$temp_file"; then
-        mv "$temp_file" "$target_file"
-        echo -e "  ${GREEN}✓${NC} .github/copilot-instructions.md (removed code-principles block)"
+        qecho "  ${NEUTRAL} No Copilot instructions found to remove."
     else
-        rm -f "$temp_file" "$target_file"
-        echo -e "  ${GREEN}✓${NC} .github/copilot-instructions.md"
+        local temp_file
+        temp_file="$(mktemp)"
+
+        awk '
+            BEGIN { in_block=0; removed=0 }
+            /^<!-- code-principles: begin -->$/ { in_block=1; removed=1; next }
+            /^<!-- code-principles: end -->$/   { if (in_block) { in_block=0; next } }
+            !in_block { print }
+            END { exit removed ? 0 : 1 }
+        ' "$target_file" > "$temp_file" || {
+            rm -f "$temp_file"
+            qecho "  ${NEUTRAL} No code-principles Copilot instructions found to remove."
+            temp_file=""
+        }
+
+        if [ -n "${temp_file:-}" ]; then
+            # Trim trailing blank lines left after block removal
+            awk '{lines[NR]=$0; if(/[^[:space:]]/) last=NR} END{for(i=1;i<=last;i++) print lines[i]}' \
+                "$temp_file" > "${temp_file}.t" && mv "${temp_file}.t" "$temp_file"
+
+            if grep -q '[^[:space:]]' "$temp_file"; then
+                mv "$temp_file" "$target_file"
+                qecho "  ${GREEN}✓${NC} .github/copilot-instructions.md (removed code-principles block)"
+            else
+                rm -f "$temp_file" "$target_file"
+                qecho "  ${GREEN}✓${NC} .github/copilot-instructions.md"
+            fi
+        fi
     fi
 
-    echo ""
-    echo -e "${BOLD}Removing GitHub Copilot skills...${NC}"
+    qecho ""
+    qecho "${BOLD}Removing GitHub Copilot skills...${NC}"
 
     local skill_count=0
     local file
@@ -252,17 +267,17 @@ uninstall_copilot_local() {
             if [ -d "$skill_dir" ]; then
                 rm -rf "$skill_dir"
                 skill_count=$((skill_count + 1))
-                echo -e "  ${GREEN}✓${NC} .github/skills/$command_name/"
+                qecho "  ${GREEN}✓${NC} .github/skills/$command_name/"
             fi
         fi
     done
 
     if [ $skill_count -eq 0 ]; then
-        echo "  ${NEUTRAL} No Copilot skills found to remove."
+        qecho "  ${NEUTRAL} No Copilot skills found to remove."
     fi
 
-    echo ""
-    echo -e "${BOLD}Removing GitHub Copilot prompt commands...${NC}"
+    qecho ""
+    qecho "${BOLD}Removing GitHub Copilot prompt commands...${NC}"
 
     local prompt_count=0
     for file in "$CLAUDE_TARGETS_DIR/"*.md; do
@@ -271,13 +286,13 @@ uninstall_copilot_local() {
             if [ -f "$prompt_file" ]; then
                 rm "$prompt_file"
                 prompt_count=$((prompt_count + 1))
-                echo -e "  ${GREEN}✓${NC} .github/prompts/$(basename "$prompt_file")"
+                qecho "  ${GREEN}✓${NC} .github/prompts/$(basename "$prompt_file")"
             fi
         fi
     done
 
     if [ $prompt_count -eq 0 ]; then
-        echo "  ${NEUTRAL} No Copilot prompt commands found to remove."
+        qecho "  ${NEUTRAL} No Copilot prompt commands found to remove."
     fi
 
     cleanup_dir_if_empty "$skills_dir"
@@ -288,10 +303,10 @@ uninstall_copilot_local() {
 uninstall_copilot_global() {
     local target_file="$EFFECTIVE_HOME/.copilot/copilot-instructions.md"
 
-    echo -e "${BOLD}Removing global Copilot instructions...${NC}"
+    qecho "${BOLD}Removing global Copilot instructions...${NC}"
 
     if [ ! -f "$target_file" ]; then
-        echo "  ${NEUTRAL} No global Copilot instructions found to remove."
+        qecho "  ${NEUTRAL} No global Copilot instructions found to remove."
         return
     fi
 
@@ -306,7 +321,7 @@ uninstall_copilot_global() {
         END { exit removed ? 0 : 1 }
     ' "$target_file" > "$temp_file" || {
         rm -f "$temp_file"
-        echo "  ${NEUTRAL} No code-principles block found in global Copilot instructions."
+        qecho "  ${NEUTRAL} No code-principles block found in global Copilot instructions."
         return
     }
 
@@ -315,10 +330,10 @@ uninstall_copilot_global() {
 
     if grep -q '[^[:space:]]' "$temp_file"; then
         mv "$temp_file" "$target_file"
-        echo -e "  ${GREEN}✓${NC} ~/.copilot/copilot-instructions.md (removed code-principles block)"
+        qecho "  ${GREEN}✓${NC} ~/.copilot/copilot-instructions.md (removed code-principles block)"
     else
         rm -f "$temp_file" "$target_file"
-        echo -e "  ${GREEN}✓${NC} ~/.copilot/copilot-instructions.md"
+        qecho "  ${GREEN}✓${NC} ~/.copilot/copilot-instructions.md"
     fi
 
     cleanup_dir_if_empty "$EFFECTIVE_HOME/.copilot"
@@ -328,26 +343,26 @@ uninstall_cursor() {
     local project_dir="${1:-}"
 
     if [ -z "$project_dir" ]; then
-        echo -e "${BOLD}Cursor — global/user scope not supported${NC}"
-        echo ""
-        echo "Cursor does not support file-based user-level rules."
-        echo "Configure manually: Cursor > Settings > General > Rules for AI"
-        echo ""
-        echo "For project-level removal: ./uninstall.sh <project-dir>"
+        qecho "${BOLD}Cursor — global/user scope not supported${NC}"
+        qecho ""
+        qecho "Cursor does not support file-based user-level rules."
+        qecho "Configure manually: Cursor > Settings > General > Rules for AI"
+        qecho ""
+        qecho "For project-level removal: ./uninstall.sh <project-dir>"
         return 0
     fi
 
     local target_file="$project_dir/.cursor/rules/code-principles.mdc"
 
-    echo -e "${BOLD}Removing Cursor rules...${NC}"
+    qecho "${BOLD}Removing Cursor rules...${NC}"
 
     if [ ! -f "$target_file" ]; then
-        echo "  ${NEUTRAL} No Cursor rule found to remove."
+        qecho "  ${NEUTRAL} No Cursor rule found to remove."
         return
     fi
 
     rm "$target_file"
-    echo -e "  ${GREEN}✓${NC} .cursor/rules/code-principles.mdc"
+    qecho "  ${GREEN}✓${NC} .cursor/rules/code-principles.mdc"
 
     cleanup_dir_if_empty "$project_dir/.cursor/rules"
     cleanup_dir_if_empty "$project_dir/.cursor"
@@ -357,14 +372,14 @@ run_uninstall() {
     require_project_dir
 
     print_header
-    echo ""
+    qecho ""
     uninstall_claude "$PROJECT_DIR"
-    echo ""
+    qecho ""
     uninstall_copilot "$PROJECT_DIR"
-    echo ""
+    qecho ""
     uninstall_cursor "$PROJECT_DIR"
-    echo ""
-    echo "Done."
+    qecho ""
+    qecho "Done."
 }
 
 case "${1:-}" in

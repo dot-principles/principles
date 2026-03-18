@@ -18,10 +18,11 @@ This document describes the full architecture of the `.principles` hierarchy sys
 - **Organizations** who want to add company-specific principles alongside the shipped catalog
 
 **How it works:**
-1. A catalog of principles lives in `principles/code/` (shipped with this repo)
+1. A catalog of principles lives in `principles/` (shipped with this repo), organized by namespace
 2. Companies add their own catalogs in `principles/<namespace>/`
 3. Projects place `.principles` files in their directories to declare which principles apply
 4. The AI resolves a hierarchy of `.principles` files (innermost overrides outermost) and reads the full principle content before coding or reviewing
+5. The artifact type of the file being reviewed is detected (code, docs, config, infra, schema, pipeline) and the matching principle stack from `layers/<type>/` is loaded
 
 **Plain-Text-as-Code:** This repo is a **Plain-Text-as-Code** system. Every artefact is plain text in version control — diffable, composable, portable, and natively readable by both humans and AI tools. Principle files are Markdown, group files are YAML, and the catalog is YAML. No binary formats, no generated code, no lock-in.
 
@@ -144,11 +145,69 @@ description: "Human-readable description of this namespace"
 |-------|----------|-------------|
 | `description` | Yes | Human-readable description of the namespace |
 
-The namespace is the directory name. IDs are derived from file paths (see Section 3) — no explicit `namespace` or `id-prefix` fields are needed. The system discovers all `principles/*/catalog.yaml` files automatically.
+The namespace is the directory name. IDs are derived from file paths (see Section 4) — no explicit `namespace` or `id-prefix` fields are needed. The system discovers all `principles/*/catalog.yaml` files automatically.
 
 ---
 
-## 🔑 3. ID Derivation
+## 🗂️ 3. Artifact Types and Stacks
+
+The layer model is not a single three-layer stack — it is a family of stacks, one per artifact type. The correct stack is selected by detecting the artifact type of the file being reviewed.
+
+### Artifact Types (`layers/artifact-types.yaml`)
+
+`layers/artifact-types.yaml` defines:
+- **Universal principles** — active for all artifact types regardless of stack
+- **Artifact type definitions** — each with a description, a stack name, and detection signals (file extensions, filenames, path patterns)
+
+Detection precedence resolves ambiguity: more specific matches win. For example, `Chart.yaml` matches the `infra` type (not `config`) because `infra` signals are evaluated before `config` signals for Helm charts.
+
+### Stacks (`layers/<stack>/`)
+
+Each stack lives in its own subdirectory under `layers/` and contains 2–3 files:
+
+| File | Purpose |
+|------|---------|
+| `layer-1-universal.md` | Always active for this artifact type — a table of principles with ID, title, and one-line summary |
+| `layer-2-contexts.yaml` | Context-activated principles, triggered by content signals within the file |
+| `layer-3-risk-signals.yaml` | Risk-elevated principles (code and infra stacks only) |
+
+### Shipped Stacks
+
+| Stack | Directory | Layers |
+|-------|-----------|--------|
+| **code** | `layers/code/` | 3 (universal → contextual → risk) |
+| **docs** | `layers/docs/` | 2 (universal → contextual) |
+| **config** | `layers/config/` | 2 (universal → contextual) |
+| **infra** | `layers/infra/` | 3 (universal → contextual → risk) |
+| **schema** | `layers/schema/` | 2 (universal → contextual) |
+| **pipeline** | `layers/pipeline/` | 2 (universal → contextual) |
+
+### Universal Principles
+
+These six principles appear in `artifact-types.yaml` and are injected into every activation regardless of stack:
+
+| ID | Why universal |
+|----|---------------|
+| `SIMPLE-DESIGN-REVEALS-INTENTION` | Clarity of expression applies to code, docs, config, and schema equally |
+| `CODE-CS-DRY` | Repetition creates drift in every artifact type |
+| `CODE-CS-KISS` | Simplicity is the goal across all artifact types |
+| `CODE-CS-YAGNI` | Avoid speculative complexity in all artifacts |
+| `CODE-DX-NAMING` | Names reveal intent in code, schema fields, config keys, and pipeline jobs |
+| `ARCH-DECISION-RECORDS` | Architectural decisions should be recorded wherever architecture is expressed |
+
+### Layer field on principle files
+
+The `**Layer:**` frontmatter field on principle files refers to the layer within the principle's home stack:
+- Layer 1 = always active for that artifact type (universal within stack)
+- Layer 2 = context-dependent (activated by content signals)
+- Layer 3 = risk-elevated (activated by risk signals)
+
+Principles in the universal set (above) are considered "stack-universal" rather than stack Layer 1 — they activate regardless of which stack is selected.
+
+---
+
+## 🔑 4. ID Derivation
+
 
 IDs are **derived from file path** — no separate ID field is needed in the file itself.
 
@@ -192,7 +251,7 @@ IDs are **derived from file path** — no separate ID field is needed in the fil
 
 ---
 
-## 📄 4. Principle File Schema
+## 📄 5. Principle File Schema
 
 Every principle file follows this template:
 
@@ -268,7 +327,7 @@ The `## Inspection` section is **optional**. It contains bash commands that `/au
 
 ---
 
-## 🗂️ 5. Groups
+## 🗂️ 6. Groups
 
 Groups bundle related principles under a reusable name. They enable one-line activation of a full principle set for a technology.
 
@@ -341,7 +400,7 @@ principles:
 
 ---
 
-## 📝 6. `.principles` File Format
+## 📝 7. `.principles` File Format
 
 Plain text. One entry per line. Filesystem mtime is the implicit last-modified timestamp.
 
@@ -423,7 +482,7 @@ When reviewing `/repo-root/src/payments/PaymentService.java`:
 
 ---
 
-## 🛠️ 7. Commands
+## 🛠️ 8. Commands
 
 ### ⚡ `/prime`
 
@@ -471,7 +530,7 @@ Analyses a project directory and creates or updates `.principles` files.
 
 ---
 
-## 📦 8. Installer Targets
+## 📦 9. Installer Targets
 
 `install.sh` deploys the three commands (`/scout`, `/prime`, `/audit`) to three AI tool families. Each target writes different files because each tool family has its own discovery mechanism.
 
@@ -533,7 +592,7 @@ Removes the assets written by `install.sh`. Without an argument, removes global 
 
 ---
 
-## ➕ 9. Adding a New Namespace
+## ➕ 10. Adding a New Namespace
 
 To add a company-specific namespace alongside the shipped `code` catalog:
 
@@ -547,7 +606,7 @@ To add a company-specific namespace alongside the shipped `code` catalog:
    description: "Acme Corp engineering standards"
    ```
 
-3. **Add principle files** following the file schema (Section 4):
+3. **Add principle files** following the file schema (Section 5):
    ```
    principles/corp/corp-0001.md    → CORP-0001
    principles/corp/infra/infra-001.md → CORP-INFRA-001
@@ -563,7 +622,7 @@ The system discovers all `principles/*/catalog.yaml` files automatically. The na
 
 ---
 
-## 🏷️ 10. ID Format Guidance
+## 🏷️ 11. ID Format Guidance
 
 ### Naming Conventions
 
@@ -591,6 +650,6 @@ Add a new category directory when:
 
 ---
 
-## 🤝 11. Contributing Principles
+## 🤝 12. Contributing Principles
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for requirements, process, and source guidelines.

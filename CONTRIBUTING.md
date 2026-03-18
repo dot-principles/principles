@@ -21,8 +21,8 @@ Every new principle must have:
 ## Process
 
 1. Copy `principles/TEMPLATE.md` to the appropriate category directory
-2. Fill in all sections — see [DESIGN.md Section 4](DESIGN.md#-4-principle-file-schema) for the full schema
-3. Derive the ID from the file path — see [DESIGN.md Section 3](DESIGN.md#-3-id-derivation)
+2. Fill in all sections — see [DESIGN.md Section 5](DESIGN.md#-5-principle-file-schema) for the full schema
+3. Derive the ID from the file path — see [DESIGN.md Section 4](DESIGN.md#-4-id-derivation)
 4. Add the principle to relevant groups in `groups/`
 5. If the principle has grep-able violations, add an `## Inspection` section and update the namespace's `.context-inspect.md` — see [DESIGN.md "Inspection — When to Add"](DESIGN.md#-inspection--when-to-add) for guidance
 6. Submit a pull request with:

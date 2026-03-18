@@ -103,21 +103,98 @@ Of course you can also write these files manually — the format is just plain t
 
 ---
 
-### 🧱 Three layers, always intentional
+### 🗂️ Not just code — review any artifact
 
-Principles are organized into three activation layers that reflect how universally they apply:
+`.principles` started as a code review tool, but a codebase is more than source files. READMEs, architecture docs, Terraform modules, GitHub Actions workflows, Protobuf schemas — these are all plain text in version control, and they all benefit from principled review.
+
+The system detects the artifact type of the file being reviewed and selects the right stack of principles automatically:
+
+| Artifact type | Examples | Principles |
+|---|---|---|
+| **Code** | `.java`, `.ts`, `.py`, `.go`, … | SOLID, GoF, fail-fast, input validation, DDD, concurrency, … |
+| **Docs** | `README.md`, `DESIGN.md`, `ADR-*.md`, … | DOC-PURPOSE, DOC-MINIMAL, DOC-AUDIENCE, DOC-ACCURACY, … |
+| **Config** | `.env`, `application.yaml`, `appsettings.json`, … | 12FACTOR-03, no hardcoded secrets, schema validation, … |
+| **Infra** | `.tf`, `Dockerfile`, `Chart.yaml`, … | IaC, immutable infra, idempotency, composable modules, … |
+| **Schema** | `.proto`, `.graphql`, `openapi.yaml`, `schema.sql`, … | Backward compatibility, self-describing, consistent naming, … |
+| **Pipeline** | `.github/workflows/`, `Jenkinsfile`, … | Idempotency, minimal permissions, no secrets in logs, … |
+
+Run `/audit README.md` and you get doc-specific findings. Run `/audit main.tf` and you get IaC-specific findings. The right principles fire for the right artifact — without any manual configuration.
+
+---
+
+### 🧱 Artifact types, stacks, and layers
+
+The layer model is per-stack. Each artifact type has its own 2–3 layer stack, and a set of truly universal principles applies across all stacks:
 
 ```mermaid
-flowchart TD
-    L1["🔵 Layer 1 - Universal<br>Always active on every file<br>SOLID · DRY · KISS · fail-fast · input validation<br>single responsibility · defence in depth"]
-    L2["🟡 Layer 2 - Contextual<br>Activated by what you're building<br>API design · DDD · concurrency · 12-Factor<br>Clean Architecture · event sourcing · CQRS"]
-    L3["🔴 Layer 3 - Risk-Elevated<br>Activated by risk signals<br>OWASP Top 10 · performance · backward compatibility<br>idempotency · data integrity · secrets hygiene"]
+flowchart TB
+    FILE["📄 File being reviewed"]
+    FILE --> DETECT["Artifact Type Detection<br>layers/artifact-types.yaml<br>by extension · path · filename"]
 
-    L1 --> L2
-    L2 --> L3
+    UNIV["Universal (all types)<br>DRY · KISS · Naming<br>Reveals Intention · YAGNI · ADR"]
+
+    DETECT -->|".java .ts .py ..."| CODE
+    DETECT -->|".md README ADR ..."| DOCS
+    DETECT -->|".env .yaml .toml ..."| CONFIG
+    DETECT -->|".tf Dockerfile ..."| INFRA
+    DETECT -->|".proto .graphql ..."| SCHEMA
+    DETECT -->|"Jenkinsfile .github/ ..."| PIPELINE
+
+    subgraph CODE ["Code Stack  (layers/code/)"]
+        direction TB
+        C1["Layer 1 — Universal<br>SOLID · GoF · Fail-fast · Validate input"]
+        C2["Layer 2 — Contextual<br>API · DDD · Concurrency · Testing"]
+        C3["Layer 3 — Risk<br>Auth · Financial · PII · Legacy"]
+        C1 --> C2 --> C3
+    end
+
+    subgraph DOCS ["Docs Stack  (layers/docs/)"]
+        direction TB
+        D1["Layer 1 — Universal<br>DOC-PURPOSE · DOC-MINIMAL<br>Code-for-readers · Reduce cognitive load"]
+        D2["Layer 2 — Contextual<br>API docs · Architecture · Tutorial · Reference"]
+        D1 --> D2
+    end
+
+    subgraph CONFIG ["Config Stack  (layers/config/)"]
+        direction TB
+        CF1["Layer 1 — Universal<br>12FACTOR-03 · No hardcoded secrets<br>Schema validation"]
+        CF2["Layer 2 — Contextual<br>Feature flags · Secrets management"]
+        CF1 --> CF2
+    end
+
+    subgraph INFRA ["Infra Stack  (layers/infra/)"]
+        direction TB
+        I1["Layer 1 — Universal<br>IaC · Immutable · Idempotent<br>Composable modules"]
+        I2["Layer 2 — Contextual<br>Kubernetes · Terraform · Docker"]
+        I3["Layer 3 — Risk<br>Production · IAM · Network exposure"]
+        I1 --> I2 --> I3
+    end
+
+    subgraph SCHEMA ["Schema Stack  (layers/schema/)"]
+        direction TB
+        S1["Layer 1 — Universal<br>Backward-compatible · Self-describing<br>Consistent naming"]
+        S2["Layer 2 — Contextual<br>Protobuf · OpenAPI · GraphQL · SQL"]
+        S1 --> S2
+    end
+
+    subgraph PIPELINE ["Pipeline Stack  (layers/pipeline/)"]
+        direction TB
+        P1["Layer 1 — Universal<br>Idempotent · Minimal permissions<br>No secrets in logs"]
+        P2["Layer 2 — Contextual<br>Build · Deploy · Release · Rollback"]
+        P1 --> P2
+    end
+
+    UNIV --> MERGE["🔀 Merge<br>Universal + Stack layers<br>+ .principles hierarchy"]
+    CODE --> MERGE
+    DOCS --> MERGE
+    CONFIG --> MERGE
+    INFRA --> MERGE
+    SCHEMA --> MERGE
+    PIPELINE --> MERGE
+    MERGE --> AI["🤖 AI Agent<br>Focused & Ready"]
 ```
 
-Layer 1 always fires. Layer 2 activates for code that warrants domain or architectural guidance. Layer 3 kicks in when risk signals are present — public APIs, financial transactions, high-traffic paths, sensitive data. `.principles` files let you compose exactly the right combination for each part of your system.
+Layer 1 of each stack always fires for that artifact type. Layer 2 activates based on content signals within the file. Layer 3 (where present) kicks in when risk signals are detected. The universal set — DRY, KISS, YAGNI, Naming, Reveals Intention, ADR — applies across all stacks.
 
 ---
 
@@ -186,11 +263,14 @@ The system walks up from the reviewed file to the git root, collecting `.princip
 
 ### 🗂️ Layer model
 
+Each artifact type has its own stack of layers in `layers/<type>/`. Within each stack:
+
 | Layer                       | When                          | What                                                                               |
 |-----------------------------|-------------------------------|------------------------------------------------------------------------------------|
-| **Layer 1 — Universal**     | Always active                 | Non-negotiable principles (validate input, single responsibility, fail fast, etc.) |
-| **Layer 2 — Contextual**    | Based on what you're building | API design, concurrency, data modeling, etc.                                       |
-| **Layer 3 — Risk-elevated** | Based on risk signals         | Security, performance, backward compatibility                                      |
+| **Universal (cross-stack)** | Always, for all types         | DRY · KISS · YAGNI · Naming · Reveals Intention · ADR |
+| **Layer 1 — Universal**     | Always, for the matched type  | Non-negotiable principles for that artifact type (e.g., code: SOLID, fail-fast; docs: DOC-PURPOSE, DOC-MINIMAL) |
+| **Layer 2 — Contextual**    | Based on content signals      | API design, concurrency, data modeling, tutorial vs. reference docs, etc.          |
+| **Layer 3 — Risk-elevated** | Based on risk signals         | Security, performance, backward compatibility (code and infra stacks only)         |
 
 ### 🛠️ Three commands
 
@@ -258,7 +338,7 @@ See [INSTALL.md](INSTALL.md) for full platform instructions (Linux, macOS, Windo
 | `CODE-DX-`  | Developer Experience                                  |
 | `CODE-TP-`  | Type & Pattern Safety                                 |
 
-Shipped groups (e.g., `@spring-boot`, `@react`, `@microservices`, `@security-focused`) bundle related principles for common stacks. See [DESIGN.md](DESIGN.md#-5-groups) for the full list.
+Shipped groups (e.g., `@spring-boot`, `@react`, `@microservices`, `@security-focused`) bundle related principles for common stacks. See [DESIGN.md](DESIGN.md#-6-groups) for the full list.
 
 Many principles include **code examples and diagrams** to make the guidance concrete — not just a definition, but a demonstration of the principle in practice.
 
@@ -293,7 +373,7 @@ Generated: C:/projects/app/audit-output.json
 
 ## 🔧 Extending with your own principles
 
-Fork this repo and add a `principles/corp/` namespace (or any name) for corporate or domain-specific principles. Reference them with `CORP-0001` in your `.principles` files. See [DESIGN.md](DESIGN.md#-9-adding-a-new-namespace) for the full process.
+Fork this repo and add a `principles/corp/` namespace (or any name) for corporate or domain-specific principles. Reference them with `CORP-0001` in your `.principles` files. See [DESIGN.md](DESIGN.md#-10-adding-a-new-namespace) for the full process.
 
 ## 🚧 Catalog status — work in progress
 
@@ -309,7 +389,9 @@ The catalog is actively growing. Planned additions are tracked in [TODO.md](TODO
 | Security architecture | Threat modelling, zero trust, supply chain security |
 | Testing | Test pyramid, contract testing, property-based testing |
 | Observability | USE method, RED method, error budgets |
-| Documentation | Docs as code, progressive disclosure, write for your audience |
+| Config principles | CONFIG-NO-HARDCODED-SECRETS, CONFIG-SCHEMA-VALIDATION |
+| Schema principles | SCHEMA-SELF-DESCRIBING |
+| Pipeline principles | PIPELINE-MINIMAL-PERMISSIONS, PIPELINE-NO-SECRETS-IN-LOGS |
 | API design | API versioning strategy, gRPC / Protobuf design |
 
 Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).

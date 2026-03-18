@@ -1,6 +1,7 @@
-# Layer 2 — Context-activated principles
+# Code Stack — Layer 2: Context-activated principles
 # Activated when code context matches the listed signals.
 # Layer 1 principles are always active; these are additive.
+# Note: infrastructure context has moved to layers/infra/ stack.
 
 api-design:
   description: "REST/HTTP API endpoints, controllers, and route handlers"
@@ -205,31 +206,6 @@ cloud-native:
     - 12FACTOR-10-DEV-PROD-PARITY
     - 12FACTOR-11-LOGS
     - 12FACTOR-12-ADMIN-PROCESSES
-
-infrastructure:
-  description: "Infrastructure-as-code and provisioning configurations"
-  signals:
-    - "terraform"
-    - "resource "
-    - "provider "
-    - "CloudFormation"
-    - "AWS::*"
-    - "ansible"
-    - "playbook"
-    - "pulumi"
-    - "cdk"
-    - ".tf"
-    - "module "
-    - "variable "
-    - "output "
-    - "data "
-    - "stack"
-  activate:
-    - CODE-AR-INFRASTRUCTURE-AS-CODE
-    - CODE-AR-PIPELINE-CHANGES
-    - CODE-AR-IMMUTABLE-INFRASTRUCTURE
-    - CODE-AR-TEST-INFRASTRUCTURE
-    - CODE-AR-COMPOSABLE-MODULES
 
 ui-interaction:
   description: "User interface components, forms, navigation, and interaction patterns"

@@ -193,10 +193,10 @@ EOF
 
 install_data() {
     echo -e "${BOLD}Installing .principles data...${NC}"
-    rm -rf "$DATA_DIR/groups" "$DATA_DIR/principles"
     mkdir -p "$DATA_DIR"
     cp -r "$SCRIPT_DIR/groups"     "$DATA_DIR/"
     cp -r "$SCRIPT_DIR/principles" "$DATA_DIR/"
+    cp -r "$SCRIPT_DIR/layers"     "$DATA_DIR/"
     echo -e "  ${GREEN}✓${NC} $DATA_DIR"
     echo ""
 }
@@ -303,6 +303,7 @@ install_copilot_local() {
     local prompt_count=0
     local file
     local skills_dir="$target_dir/skills"
+
     for file in "$CLAUDE_TARGETS_DIR/"*.md; do
         if [ -f "$file" ]; then
             local command_name
@@ -480,15 +481,19 @@ DIR_ARG="$(normalize_directory_path "${2:-}")"
 
 case "${1:-}" in
     claude)
+        "$SCRIPT_DIR/uninstall.sh" --quiet ${DIR_ARG:+"$DIR_ARG"}
         install_claude "$DIR_ARG"
         ;;
     copilot)
+        "$SCRIPT_DIR/uninstall.sh" --quiet ${DIR_ARG:+"$DIR_ARG"}
         install_copilot "$DIR_ARG"
         ;;
     cursor)
+        "$SCRIPT_DIR/uninstall.sh" --quiet ${DIR_ARG:+"$DIR_ARG"}
         install_cursor "$DIR_ARG"
         ;;
     all)
+        "$SCRIPT_DIR/uninstall.sh" --quiet ${DIR_ARG:+"$DIR_ARG"}
         install_claude "$DIR_ARG"
         echo ""
         install_copilot "$DIR_ARG"
