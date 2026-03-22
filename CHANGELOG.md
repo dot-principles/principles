@@ -12,7 +12,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## [v0.3.1] — 2026-03-22
+## [v0.3.2] — 2026-03-22
+
+### Changed
+
+- **`/audit` explicit principle override** — `/audit` now accepts an explicit principle spec to force a specific principle set, bypassing `.principles` files and dynamic detection entirely. Three equivalent syntaxes are supported:
+  - `<spec> on <target>` — natural language: `/audit DDD on src/orders`
+  - `<target> --with <spec>` — flag syntax: `/audit src/orders --with DDD`
+  - `@<group> <target>` — group-prefix syntax: `/audit @ddd src/orders`
+  - Multiple groups supported comma-separated: `/audit clean-arch, solid on src/`
+  - `principle_source` in `audit-output.json` reports `explicit: <spec>` when override is active.
+
+---
+
+## [v0.3.1] — 2026-03-19
 
 ### Added
 
@@ -83,7 +96,8 @@ See [TODO.md](TODO.md) for the roadmap.
 
 ---
 
-[v0.3.1]: https://github.com/dot-principles/principles/releases/tag/v0.3.1
+[v0.3.2]: https://github.com/dot-principles/dot-principles/releases/tag/v0.3.2
+[v0.3.1]: https://github.com/dot-principles/dot-principles/releases/tag/v0.3.1
 [v0.3.0]: https://github.com/dot-principles/principles/releases/tag/v0.3.0
 [v0.2.0]: https://github.com/dot-principles/principles/releases/tag/v0.2.0
 [v0.1.0]: https://github.com/dot-principles/principles/releases/tag/v0.1.0
