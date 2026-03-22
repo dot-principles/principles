@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+
+- **8 new API design principles** in `code/api` namespace — `CODE-API-RATE-LIMITING` (with inspection), `CODE-API-PROBLEM-DETAILS`, `CODE-API-PAGINATION` (with inspection), `CODE-API-HTTP-CACHING` (with inspection), `CODE-API-CONDITIONAL-REQUESTS` (with inspection), `CODE-API-CONTENT-NEGOTIATION` (with inspection), `CODE-API-API-VERSIONING` (with inspection), `CODE-API-GRPC-PROTOBUF` (with inspection). Sources: RFC 6585, RFC 7807/9457, RFC 5988, RFC 9111, RFC 7232, RFC 7231/9110, RFC 8594, Richardson & Ruby *RESTful Web Services*, Indrasiri & Kuruppu *gRPC: Up and Running*, Google API Design Guide.
+- **Context files for `code/api`** — `.context-audit.md`, `.context-prime.md`, and `.context-inspect.md` created, covering all 13 API principles (5 existing + 8 new).
+
 ---
 
 ## [v0.3.2] — 2026-03-22

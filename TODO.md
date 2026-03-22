@@ -1,11 +1,5 @@
 # 📋 TODO — Principle gaps to fill
 
-## 🌐 API design
-Extend `code/api`
-
-- [ ] API versioning strategy — version APIs explicitly; define a policy for introducing breaking changes and supporting deprecated versions
-- [ ] gRPC / Protobuf design — define service contracts in `.proto` files; use field numbers for backward compatibility; prefer streaming for high-throughput flows
-
 ## ⚙️ Configuration file principles
 New namespace: `config-principles` (to populate the `config` group more fully)
 

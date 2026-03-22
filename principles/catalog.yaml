@@ -281,6 +281,12 @@ CLEAN-ARCH-SEPARATE-BUSINESS-RULES:
 # CODE
 # =============================================================================
 
+CODE-API-API-VERSIONING:
+  title: "Version APIs explicitly and define a policy for breaking changes"
+  layer: 2
+  categories: [api-design, backward-compatibility, rest]
+  applies_to: [all]
+
 CODE-API-BACKWARD-COMPATIBILITY:
   title: "Support backward compatibility — never break existing clients"
   layer: 2
@@ -309,6 +315,48 @@ CODE-API-STANDARD-HTTP-METHODS:
   title: "Use standard HTTP methods with their defined semantics"
   layer: 2
   categories: [api-design, rest, protocol-design]
+  applies_to: [all]
+
+CODE-API-CONDITIONAL-REQUESTS:
+  title: "Support conditional requests for safe concurrent writes and cache revalidation"
+  layer: 2
+  categories: [api-design, reliability, rest]
+  applies_to: [all]
+
+CODE-API-CONTENT-NEGOTIATION:
+  title: "Honour the Accept header and respond with the negotiated content type"
+  layer: 2
+  categories: [api-design, rest, interoperability]
+  applies_to: [all]
+
+CODE-API-GRPC-PROTOBUF:
+  title: "Define gRPC service contracts in .proto files; evolve them without breaking existing clients"
+  layer: 2
+  categories: [api-design, protocol-design, backward-compatibility]
+  applies_to: [all]
+
+CODE-API-HTTP-CACHING:
+  title: "Set Cache-Control and validation headers on cacheable responses"
+  layer: 2
+  categories: [api-design, performance, rest]
+  applies_to: [all]
+
+CODE-API-PAGINATION:
+  title: "Paginate all collection resources; never return unbounded results"
+  layer: 2
+  categories: [api-design, performance, reliability]
+  applies_to: [all]
+
+CODE-API-PROBLEM-DETAILS:
+  title: "Return structured error responses using the RFC 7807 Problem Details format"
+  layer: 2
+  categories: [api-design, developer-experience, rest]
+  applies_to: [all]
+
+CODE-API-RATE-LIMITING:
+  title: "Enforce rate limits and signal capacity constraints with standard headers"
+  layer: 2
+  categories: [api-design, reliability, security]
   applies_to: [all]
 
 CODE-AR-ASYNC-MESSAGING:
